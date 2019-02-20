@@ -8,5 +8,6 @@ lazy val root = (project in file("."))
     version := "0.1.0-SNAPSHOT",
     sbtPlugin := true,
     scalaVersion := "2.12.8",
-    libraryDependencies ++= Dependencies.library
+    libraryDependencies ++= Dependencies.library,
+    scriptedBufferLog := false
   )

@@ -5,20 +5,25 @@ import sbt._
 
 object BomSbtPlugin extends AutoPlugin {
 
-  object autoImport {
-    val bomTest = TaskKey[String](
-      "bom-test",
-      "Sample task"
-    )
-  }
+  override def trigger: PluginTrigger = allRequirements
+
+  object autoImport extends BomSbtKeys
 
   import autoImport._
 
-  override lazy val projectSettings = Seq(
-    bomTest := {
-      streams.value.log.info("BOM Test")
-      "BOM Test"
-    }
+  override lazy val projectSettings: Seq[Setting[_]] = Seq(
+    targetBomFile := target.value / "bom.xml",
+    makeBom := makeBomTask.value
   )
+
+  private def makeBomTask = Def.task[File] {
+    val log = sLog.value
+
+    lazy val bom = targetBomFile.value
+
+    log.info("Creating bom file...")
+
+    bom
+  }
 
 }
