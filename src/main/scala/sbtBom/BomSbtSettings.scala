@@ -5,17 +5,33 @@ import java.nio.channels.Channels
 
 import sbt.{Def, File, Setting, _}
 import sbt.Keys.{sLog, target}
-import sbtBom.BomSbtPlugin.autoImport.{makeBom, targetBomFile}
+import sbtBom.BomSbtPlugin.autoImport.{listAll, makeBom, targetBomFile}
 
 import scala.xml.{Elem, PrettyPrinter, XML}
 import scala.util.control.Exception.ultimately
 
 object BomSbtSettings {
   def projectSettings: Seq[Setting[_]] = {
+    val configs = Seq(Compile, Test, IntegrationTest, Runtime, Provided, Optional)
     Seq(
       targetBomFile := target.value / "bom.xml",
-      makeBom := makeBomTask.value
-    )
+      makeBom := makeBomTask.value,
+    ) ++ configs.map(listAll := printReport(Classpaths.updateTask.value, _))
+  }
+
+  private def printReport(report: UpdateReport, config: Configuration): Unit = {
+    report.configuration(config).map {
+      r =>
+        println("listing all dependencies")
+        println(r.toString())
+        println(s"configuration: ${config.name}")
+    }
+  }
+
+  private def listAllTask: Def.Initialize[Task[Unit]] = Def.task[Unit] {
+    val log = sLog.value
+
+    log.info("listing all dependencies")
   }
 
   private def makeBomTask: Def.Initialize[Task[sbt.File]] = Def.task[File] {
