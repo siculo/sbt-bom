@@ -5,47 +5,50 @@ import java.nio.channels.Channels
 
 import sbt.{Def, File, Setting, _}
 import sbt.Keys.{sLog, target}
-import sbtBom.BomSbtPlugin.autoImport.{listAll, makeBom, targetBomFile}
+import sbtBom.BomSbtPlugin.autoImport._
 
 import scala.xml.{Elem, PrettyPrinter, XML}
 import scala.util.control.Exception.ultimately
 
 object BomSbtSettings {
   def projectSettings: Seq[Setting[_]] = {
-    val configs = Seq(Compile, Test, IntegrationTest, Runtime, Provided, Optional)
+    // val configs = Seq(Compile, Test, IntegrationTest, Runtime, Provided, Optional)
     Seq(
       targetBomFile := target.value / "bom.xml",
-      makeBom := makeBomTask.value,
-    ) ++ configs.map(listAll := printReport(Classpaths.updateTask.value, _))
+      makeBom := Def.taskDyn(makeBomTask(Classpaths.updateTask.value)).value,
+      listBom := Def.taskDyn(listBomTask(Classpaths.updateTask.value)).value,
+    )
   }
 
-  private def printReport(report: UpdateReport, config: Configuration): Unit = {
-    report.configuration(config).map {
-      r =>
-        println("listing all dependencies")
-        println(r.toString())
-        println(s"configuration: ${config.name}")
-    }
-  }
-
-  private def listAllTask: Def.Initialize[Task[Unit]] = Def.task[Unit] {
-    val log = sLog.value
-
-    log.info("listing all dependencies")
-  }
-
-  private def makeBomTask: Def.Initialize[Task[sbt.File]] = Def.task[File] {
+  private def makeBomTask(
+      report: UpdateReport): Def.Initialize[Task[sbt.File]] = Def.task[File] {
     val log = sLog.value
     val bomFile = targetBomFile.value
 
     log.info(s"Creating bom file ${bomFile.getAbsolutePath}")
 
-    writeXmlToFile(new BomBuilder().build, "UTF8", bomFile)
+    writeXmlToFile(new BomBuilder(report.configuration(Compile)).build,
+                   "UTF8",
+                   bomFile)
 
     log.info(s"Bom file ${bomFile.getAbsolutePath} created")
 
     bomFile
   }
+
+  private def listBomTask(report: UpdateReport): Def.Initialize[Task[String]] =
+    Def.task[String] {
+      val log = sLog.value
+
+      log.info("Creating bom")
+
+      val bomText =
+        xmlToText(new BomBuilder(report.configuration(Compile)).build, "UTF8")
+
+      log.info("Bom created")
+
+      bomText
+    }
 
   private def writeXmlToFile(xml: Elem,
                              encoding: String,

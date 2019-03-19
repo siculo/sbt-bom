@@ -8,6 +8,6 @@ trait BomSbtKeys {
 
   lazy val makeBom = taskKey[File]("Generates bom file which includes all project dependencies")
 
-  lazy val listAll = taskKey[Unit]("List all dependencies")
+  lazy val listBom = taskKey[String]("Returns a bom which includes all project dependencies")
 
 }
