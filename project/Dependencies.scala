@@ -1,15 +1,8 @@
 import sbt._
 
 object Dependencies {
-
-  private val circeVersion = "0.10.0"
-  private val scalatestVersion = "3.0.5"
-
   lazy val library = Seq(
-    "io.circe" %% "circe-core" % circeVersion,
-    "io.circe" %% "circe-generic" % circeVersion,
-    "io.circe" %% "circe-parser" % circeVersion,
-    "org.scalatest" %% "scalatest" % scalatestVersion % Test,
+    "org.cyclonedx" % "cyclonedx-core-java" % "1.1.2",
+    "org.scalatest" %% "scalatest" % "3.0.5" % Test,
   )
-
 }

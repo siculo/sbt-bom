@@ -9,5 +9,6 @@ lazy val root = (project in file("."))
     scalaVersion := "2.12.8",
     libraryDependencies ++= Dependencies.library,
     scriptedLaunchOpts += ("-Dplugin.version=" + version.value),
-    scriptedBufferLog := false
+    scriptedBufferLog := false,
+    dependencyOverrides += "org.typelevel" %% "jawn-parser" % "0.14.1"
   )

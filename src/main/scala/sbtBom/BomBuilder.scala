@@ -46,9 +46,14 @@ class BomBuilder(reportOption: Option[ConfigurationReport]) {
   }
 
   private def buildLicense(license: (String, Option[String])): Elem = {
-    // todo: license id has to be found in SPDX license database
+    // todo: find the right id
+    val licenseIdDescr = license._1.replace(' ', '-')
+    val licenseId = license._2.flatMap {
+      url =>
+        LicensesArchive.findByUrl(url)
+    }.map(_.id).getOrElse(licenseIdDescr)
     <license>
-      <id>{license._1}</id>
+      <id>{licenseId}</id>
     </license>
   }
 }
