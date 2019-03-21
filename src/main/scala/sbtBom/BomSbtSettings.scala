@@ -27,7 +27,7 @@ object BomSbtSettings {
 
     log.info(s"Creating bom file ${bomFile.getAbsolutePath}")
 
-    writeXmlToFile(new BomBuilder(report.configuration(Compile)).build,
+    writeXmlToFile(new OldBomBuilder(report.configuration(Compile)).build,
                    "UTF-8",
                    bomFile)
 
@@ -43,7 +43,7 @@ object BomSbtSettings {
       log.info("Creating bom")
 
       val bomText =
-        xmlToText(new BomBuilder(report.configuration(Compile)).build, "UTF8")
+        xmlToText(new OldBomBuilder(report.configuration(Compile)).build, "UTF8")
 
       log.info("Bom created")
 
