@@ -2,7 +2,7 @@ package sbtBom
 
 import sbt.librarymanagement.{ConfigurationReport, ModuleReport}
 
-import scala.xml.{Elem, NodeBuffer, XML}
+import scala.xml.{Elem, Node, NodeBuffer, XML}
 
 class BomBuilder(reportOption: Option[ConfigurationReport]) {
   def build: Elem = {
@@ -27,17 +27,12 @@ class BomBuilder(reportOption: Option[ConfigurationReport]) {
     </component>
   }
 
-  private def buildLicenses(licenses: Seq[(String, Option[String])]): Elem = {
-    <licenses>
-      {
-        if (licenses.isEmpty) {
-          unlicensed
-        } else {
-          licenses.map(buildLicense(_))
-        }
-      }
-    </licenses>
-  }
+  private def buildLicenses(licenses: Seq[(String, Option[String])]): Seq[Node] =
+    if (licenses.isEmpty) {
+      unlicensed
+    } else {
+      licenses.map(buildLicense(_))
+    }
 
   private val unlicensed = {
     <license>
@@ -48,12 +43,14 @@ class BomBuilder(reportOption: Option[ConfigurationReport]) {
   private def buildLicense(license: (String, Option[String])): Elem = {
     // todo: find the right id
     val licenseIdDescr = license._1.replace(' ', '-')
-    val licenseId = license._2.flatMap {
-      url =>
+    val licenseId = license._2
+      .flatMap { url =>
         LicensesArchive.findByUrl(url)
-    }.map(_.id).getOrElse(licenseIdDescr)
+      }
+      .map(_.id)
+      .getOrElse(licenseIdDescr)
     <license>
-      <id>{licenseId}</id>
+      <name>{license._1}</name>
     </license>
   }
 }

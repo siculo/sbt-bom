@@ -28,7 +28,7 @@ object BomSbtSettings {
     log.info(s"Creating bom file ${bomFile.getAbsolutePath}")
 
     writeXmlToFile(new BomBuilder(report.configuration(Compile)).build,
-                   "UTF8",
+                   "UTF-8",
                    bomFile)
 
     log.info(s"Bom file ${bomFile.getAbsolutePath} created")
@@ -56,7 +56,7 @@ object BomSbtSettings {
     writeToFile(xmlToText(xml, encoding), encoding, destFile)
 
   private def xmlToText(bomContent: Elem, encoding: String): String =
-    "<?xml version='1.0' encoding='" + encoding + "'?>\n" +
+    "<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>\n" +
       new PrettyPrinter(80, 2).format(bomContent)
 
   private def writeToFile(content: String,
