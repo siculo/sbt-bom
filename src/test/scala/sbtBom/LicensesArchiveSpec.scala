@@ -26,9 +26,9 @@ class LicensesArchiveSpec extends WordSpec with Matchers {
       val zeroBsd = register.findByUrl("http://landley.net/toybox/license.html")
 
       gps2.isDefined shouldBe true
-      gps2.get.id shouldBe "GPL-2.0"
+      gps2.get.id shouldBe Some("GPL-2.0")
       zeroBsd.isDefined shouldBe true
-      zeroBsd.get.id shouldBe "0BSD"
+      zeroBsd.get.id shouldBe Some("0BSD")
     }
 
     "find no licenses by id" in {
@@ -39,14 +39,14 @@ class LicensesArchiveSpec extends WordSpec with Matchers {
     "shoud read licenses from resource file" in {
       val gpl2OrLater = LicensesArchive.findByUrl("http://www.opensource.org/licenses/GPL-2.0")
       gpl2OrLater.isDefined shouldBe true
-      gpl2OrLater.get.id shouldBe "GPL-2.0-or-later"
+      gpl2OrLater.get.id shouldBe Some("GPL-2.0-or-later")
     }
 
     "find licenses by id" in {
       val register = new LicensesArchive(new LicensesArchiveParser(xml).licenses)
       val gpl2 = register.findById("GPL-2.0")
       gpl2.isDefined shouldBe true
-      gpl2.get.id shouldBe "GPL-2.0"
+      gpl2.get.id shouldBe Some("GPL-2.0")
     }
   }
 

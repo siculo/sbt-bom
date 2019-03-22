@@ -1,5 +1,7 @@
 package sbtBom
 
+import sbtBom.model.License
+
 import scala.util.Try
 import scala.xml.{Node, XML}
 
@@ -13,7 +15,7 @@ class LicensesArchiveParser(textArchive: String) {
       (root \ "licenses").map { license =>
         val licenseId = (license \ "licenseId").text
         val refs = (license \ "seeAlso").map(_.text)
-        License(licenseId, refs)
+        License(id = Some(licenseId), references = refs)
       }
     }
 
