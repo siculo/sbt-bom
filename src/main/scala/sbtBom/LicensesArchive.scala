@@ -1,5 +1,7 @@
 package sbtBom
 
+import sbtBom.model.License
+
 import scala.io.Source
 
 class LicensesArchive(licenses: Seq[License]) {
@@ -13,7 +15,7 @@ class LicensesArchive(licenses: Seq[License]) {
 
   def findByUrl(url: String): Option[License] = licensesByUrl.get(url)
 
-  def findById(id: String): Option[License] = licenses.find(_.id == id)
+  def findById(id: String): Option[License] = licenses.find(_.id == Some(id))
 }
 
 object LicensesArchive {
