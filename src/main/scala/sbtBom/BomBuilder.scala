@@ -43,20 +43,19 @@ class BomBuilder(dependencies: Dependencies) {
       {license.name xmlMap (<name></name>)}
     </license>
 
-
   private def buildHashes(d: Dependency) = {
     import scala.collection.JavaConverters._
-    d.file.map {
-      f =>
+    d.file
+      .map { f =>
         <hashes>
-        {
-        BomUtils.calculateHashes(f).asScala.map { hash =>
-              <hash alg={hash.getAlgorithm}>{hash.getValue}</hash>
-        }
-        }
+        { BomUtils.calculateHashes(f).asScala.map(buildHash) }
         </hashes>
-    }.getOrElse(NodeSeq.Empty)
+      }
+      .getOrElse(NodeSeq.Empty)
   }
+
+  private def buildHash(hash: Hash) =
+    <hash alg={hash.getAlgorithm}>{hash.getValue}</hash>
 
   implicit class OptionElem[T](opt: Option[T]) {
     def xmlMap(e: Elem): NodeSeq =
