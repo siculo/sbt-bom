@@ -7,14 +7,10 @@ import sbtBom.model.License
 
 import scala.xml.{Node, NodeSeq, PrettyPrinter}
 
+/*
+  todo customize xml matching in the right way
+ */
 class BomBuilderSpec extends WordSpec with Matchers {
-  /*
-    todo
-    - customize xml matching in the right way
-    - description, publisher
-    - conver from dependency report to abstract dependecies (use mocks?)
-   */
-
   "bom" should {
     "have a root with all required properties" in {
       val rootWithoutContent = root.copy(child = Seq())
@@ -28,7 +24,6 @@ class BomBuilderSpec extends WordSpec with Matchers {
     }
 
     "contains all library components" in {
-      val allComponents = root \ "components" \ "component"
       allComponents.foreach(
         _.attribute("type").get.text shouldBe "library"
       )
@@ -128,9 +123,10 @@ class BomBuilderSpec extends WordSpec with Matchers {
   private val builder = new BomBuilder(dependencies)
   private val root = builder.build
 
-  private val jacksonComponent = (root \ "components" \ "component").head
-  private val pivotalComponent = (root \ "components" \ "component")(1)
-  private val esapiComponent = (root \ "components" \ "component")(2)
+  private val allComponents = root \ "components" \ "component"
+  private val jacksonComponent = allComponents.head
+  private val pivotalComponent = allComponents(1)
+  private val esapiComponent = allComponents(2)
 
   private def getResourceFile(resourcePath: String) = {
     getClass.getResource(resourcePath) match {
