@@ -1,5 +1,5 @@
-The file "licenses.json" in this directory is distributed
-by SPDX Workgroup (https://spdx.org/) under terms and
-conditions of the following license:
+Updated version of licenses.json file may be found here:
+https://github.com/spdx/license-list-data
 
-https://github.com/spdx/LicenseListPublisher/blob/master/LICENSE
+licenses.xml is generated from original licenses.json using online xml converter:
+http://convertjson.com/json-to-xml.htm

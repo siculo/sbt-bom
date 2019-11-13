@@ -37,7 +37,7 @@ class LicensesArchiveSpec extends WordSpec with Matchers {
     }
 
     "shoud read licenses from resource file" in {
-      val gpl2OrLater = LicensesArchive.findByUrl("http://www.opensource.org/licenses/GPL-2.0")
+      val gpl2OrLater = LicensesArchive.findByUrl("https://opensource.org/licenses/GPL-2.0")
       gpl2OrLater.isDefined shouldBe true
       gpl2OrLater.get.id shouldBe Some("GPL-2.0-or-later")
     }
