@@ -1,4 +1,6 @@
-# sbt bom
+# Exists
+
+*sample sbt-bom project*
 
 ### how to run the project
 
