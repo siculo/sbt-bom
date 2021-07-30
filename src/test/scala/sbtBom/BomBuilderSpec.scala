@@ -1,8 +1,9 @@
 package sbtBom
 
 import java.io.File
-
-import org.scalatest.{Assertion, Matchers, WordSpec}
+import org.scalatest.Assertion
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import sbtBom.model.License
 
 import scala.xml.{Node, NodeSeq, PrettyPrinter}
@@ -10,7 +11,7 @@ import scala.xml.{Node, NodeSeq, PrettyPrinter}
 /*
   todo customize xml matching in the right way
  */
-class BomBuilderSpec extends WordSpec with Matchers {
+class BomBuilderSpec extends AnyWordSpec with Matchers {
   "bom" should {
     "have a root with all required properties" in {
       val rootWithoutContent = root.copy(child = Seq())
@@ -50,12 +51,13 @@ class BomBuilderSpec extends WordSpec with Matchers {
     }
 
     "have hashes properties" in {
+      println(jacksonComponent \ "hashes")
+
       jacksonComponent \ "hashes" shouldBeSameXml
         <hashes>
           <hash alg="MD5">7cb6cc60cda9078bcbe999e8cdf14205</hash>
           <hash alg="SHA-1">ba568f5409525999f925bd2cad1c8c2ba183816e</hash>
           <hash alg="SHA-256">7b69afd8fdd8683d945ee55a8993b32debe49a905ccea2955a6d56ff5cc9fd24</hash>
-          <hash alg="SHA-384">21a0e2c090381cf78b6b2e9291609d8a487c0fbd3c1c65a05723c8f1e3fccd0a7a085977a2b7c90325ab8ada08508ed8</hash>
           <hash alg="SHA-512">6ba1ec55d95cfb5689d78e3f02316842b50fa5b47f77647efca8e04dc0f9d765e49f84f4ee51e798e3270518fd7668bb9f4fd3d3315ff2791f22a560c58afd9d</hash>
         </hashes>
     }

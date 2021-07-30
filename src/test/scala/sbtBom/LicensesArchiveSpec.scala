@@ -1,8 +1,9 @@
 package sbtBom
 
-import org.scalatest.{Matchers, WordSpec}
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 
-class LicensesArchiveSpec extends WordSpec with Matchers {
+class LicensesArchiveSpec extends AnyWordSpec with Matchers {
   "LicensesArchiveParser" should {
     "fail parsing a not valid archive"  in {
       new LicensesArchiveParser("").isValid shouldBe false
@@ -39,7 +40,7 @@ class LicensesArchiveSpec extends WordSpec with Matchers {
     "shoud read licenses from resource file" in {
       val gpl2OrLater = LicensesArchive.findByUrl("https://opensource.org/licenses/GPL-2.0")
       gpl2OrLater.isDefined shouldBe true
-      gpl2OrLater.get.id shouldBe Some("GPL-2.0-or-later")
+      gpl2OrLater.get.id shouldBe Some("GPL-2.0")
     }
 
     "find licenses by id" in {
