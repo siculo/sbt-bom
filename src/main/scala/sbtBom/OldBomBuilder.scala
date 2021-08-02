@@ -1,30 +1,29 @@
 package sbtBom
 
-import org.cyclonedx.util.BomUtils
 import sbt.librarymanagement.{ConfigurationReport, ModuleReport}
 
-import scala.xml.{Elem, Node, NodeBuffer, XML}
+import scala.xml.{Elem, Node}
 
 class OldBomBuilder(reportOption: Option[ConfigurationReport]) {
   def build: Elem = {
     <bom xmlns="http://cyclonedx.org/schema/bom/1.0" version="1">
       <components>
-        { reportOption.map(buildComponents(_)).getOrElse(Seq()) }
+        {reportOption.map(buildComponents).getOrElse(Seq())}
       </components>
     </bom>
   }
 
   private def buildComponents(report: ConfigurationReport): Seq[Elem] = {
-    report.modules.map(buildModule(_))
+    report.modules.map(buildModule)
   }
 
   private def buildModule(report: ModuleReport): Elem = {
     <component type="library">
-      <group>{ report.module.organization }</group>
-      <name>{ report.module.name }</name>
-      <version>{ report.module.revision }</version>
-      <licenses>{ buildLicenses(report.licenses) }</licenses>
-      <modified>{ false }</modified>
+      <group>{report.module.organization}</group>
+      <name>{report.module.name}</name>
+      <version>{report.module.revision}</version>
+      <licenses>{buildLicenses(report.licenses)}</licenses>
+      <modified>{false}</modified>
     </component>
   }
 
@@ -32,7 +31,7 @@ class OldBomBuilder(reportOption: Option[ConfigurationReport]) {
     if (licenses.isEmpty) {
       unlicensed
     } else {
-      licenses.map(buildLicense(_))
+      licenses.map(buildLicense)
     }
 
   private val unlicensed = {

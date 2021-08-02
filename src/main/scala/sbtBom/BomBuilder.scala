@@ -1,13 +1,11 @@
 package sbtBom
 
 import org.cyclonedx.CycloneDxSchema
-
-import java.util
 import org.cyclonedx.model.Hash
 import org.cyclonedx.util.BomUtils
 import sbtBom.model.{Dependencies, Dependency, License}
 
-import scala.xml.{Atom, Elem, NodeSeq, Text}
+import scala.xml.{Elem, NodeSeq, Text}
 
 class BomBuilder(dependencies: Dependencies) {
   def build: Elem =
@@ -32,7 +30,7 @@ class BomBuilder(dependencies: Dependencies) {
     </component>
 
   private def buildLicenses(d: Dependency) =
-    if (!d.licenses.isEmpty) {
+    if (d.licenses.nonEmpty) {
       <licenses>
         {d.licenses.map(buildLicense)}
       </licenses>
@@ -40,8 +38,7 @@ class BomBuilder(dependencies: Dependencies) {
 
   private def buildLicense(license: License) =
     <license>
-      {license.id xmlMap (<id></id>)}
-      {license.name xmlMap (<name></name>)}
+      {license.id xmlMap (<id></id>)}{license.name xmlMap (<name></name>)}
     </license>
 
   private def buildHashes(d: Dependency) = {
@@ -49,7 +46,7 @@ class BomBuilder(dependencies: Dependencies) {
     d.file
       .map { f =>
         <hashes>
-        { BomUtils.calculateHashes(f, CycloneDxSchema.Version.VERSION_10).asScala.map(buildHash) }
+          {BomUtils.calculateHashes(f, CycloneDxSchema.Version.VERSION_10).asScala.map(buildHash)}
         </hashes>
       }
       .getOrElse(NodeSeq.Empty)

@@ -6,16 +6,16 @@ import scala.io.Source
 
 class LicensesArchive(licenses: Seq[License]) {
   private val licensesByUrl: Map[String, License] = licenses.foldLeft(Map[String, License]()) {
-  (map, license) =>
-    map ++ license.references.foldLeft (Map[String, License]()) {
-      (map, ref) =>
-        map + (ref -> license)
-    }
+    (map, license) =>
+      map ++ license.references.foldLeft(Map[String, License]()) {
+        (map, ref) =>
+          map + (ref -> license)
+      }
   }
 
   def findByUrl(url: String): Option[License] = licensesByUrl.get(url)
 
-  def findById(id: String): Option[License] = licenses.find(_.id == Some(id))
+  def findById(id: String): Option[License] = licenses.find(_.id.contains(id))
 }
 
 object LicensesArchive {

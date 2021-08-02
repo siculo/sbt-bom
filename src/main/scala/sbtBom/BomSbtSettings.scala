@@ -1,14 +1,13 @@
 package sbtBom
 
-import java.io.FileOutputStream
-import java.nio.channels.Channels
-
-import sbt.{Def, File, Setting, _}
 import sbt.Keys.{sLog, target}
+import sbt.{Def, File, Setting, _}
 import sbtBom.BomSbtPlugin.autoImport._
 
-import scala.xml.{Elem, PrettyPrinter, XML}
+import java.io.FileOutputStream
+import java.nio.channels.Channels
 import scala.util.control.Exception.ultimately
+import scala.xml.{Elem, PrettyPrinter}
 
 object BomSbtSettings {
   def projectSettings: Seq[Setting[_]] = {
@@ -20,16 +19,15 @@ object BomSbtSettings {
     )
   }
 
-  private def makeBomTask(
-      report: UpdateReport): Def.Initialize[Task[sbt.File]] = Def.task[File] {
+  private def makeBomTask(report: UpdateReport): Def.Initialize[Task[sbt.File]] = Def.task[File] {
     val log = sLog.value
     val bomFile = targetBomFile.value
 
     log.info(s"Creating bom file ${bomFile.getAbsolutePath}")
 
     writeXmlToFile(new OldBomBuilder(report.configuration(Compile)).build,
-                   "UTF-8",
-                   bomFile)
+      "UTF-8",
+      bomFile)
 
     log.info(s"Bom file ${bomFile.getAbsolutePath} created")
 
@@ -62,9 +60,9 @@ object BomSbtSettings {
   private def writeToFile(content: String,
                           encoding: String,
                           destFile: sbt.File): Unit = {
-    destFile.getParentFile().mkdirs()
+    destFile.getParentFile.mkdirs()
     val fos = new FileOutputStream(destFile.getAbsolutePath)
-    val writer = Channels.newWriter(fos.getChannel(), encoding)
+    val writer = Channels.newWriter(fos.getChannel, encoding)
     ultimately(writer.close())(
       writer.write(content)
     )

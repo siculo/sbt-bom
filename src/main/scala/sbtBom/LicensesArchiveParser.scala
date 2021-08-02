@@ -19,7 +19,7 @@ class LicensesArchiveParser(textArchive: String) {
       }
     }
 
-  lazy val licenses = licensesTry.getOrElse(Seq())
+  lazy val licenses: Seq[License] = licensesTry.getOrElse(Seq())
 
-  lazy val isValid = licensesTry.isSuccess
+  lazy val isValid: Boolean = licensesTry.isSuccess
 }
