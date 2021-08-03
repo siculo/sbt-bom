@@ -91,33 +91,14 @@ class BomBuilderSpec extends AnyWordSpec with Matchers {
     }
   }
 
-  val jackson = model.Dependency(
-    group = "org.codehaus.jackson",
-    name = "jackson-jaxrs",
-    version = "1.9.13",
-    modified = false,
-    file = getResourceFile("/jackson.txt"),
-  )
+  val jackson = model.Dependency(group = "org.codehaus.jackson", name = "jackson-jaxrs", version = "1.9.13", modified = false, file = getResourceFile("/jackson.txt"))
 
-  val pivotal = model.Dependency(
-    group = "org.springframework.boot",
-    name = "spring-boot-legacy",
-    version = "1.0.1.RELEASE",
-    modified = true,
-    licenses = Seq(License(id = Some("Apache-2.0"), name = Some("Apache 2.0"))),
-    file = getResourceFile("/pivotal.txt"),
-  )
+  val pivotal = model.Dependency(group = "org.springframework.boot", name = "spring-boot-legacy", version = "1.0.1.RELEASE", modified = true, licenses = Seq(License(id = Some("Apache-2.0"), name = Some("Apache 2.0"))), file = getResourceFile("/pivotal.txt"))
 
-  val esapi = model.Dependency(
-    group = "org.owasp.esapi",
-    name = "esapi",
-    version = "2.0GA",
-    modified = false,
-    licenses = Seq(
-      License(name = Some("BSD")),
-      License(name = Some("Creative Commons 3.0 BY-SA")),
-    )
-  )
+  val esapi = model.Dependency(group = "org.owasp.esapi", name = "esapi", version = "2.0GA", modified = false, licenses = Seq(
+          License(name = Some("BSD")),
+          License(name = Some("Creative Commons 3.0 BY-SA")),
+        ))
 
   private val printer = new PrettyPrinter(80, 2)
 

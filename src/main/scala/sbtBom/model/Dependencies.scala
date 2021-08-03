@@ -1,6 +1,6 @@
 package sbtBom.model
 
-class Dependencies private(val all: Seq[Dependency]) {
+case class Dependencies (all: Seq[Dependency]) {
   def :+(dependency: Dependency) = new Dependencies(all :+ dependency)
 }
 
