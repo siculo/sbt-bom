@@ -1,13 +1,14 @@
 package sbtBom
 
+import sbt.{Configuration, UpdateReport}
 import sbt.librarymanagement.{ConfigurationReport, ModuleReport}
 import sbtBom.model.{Dependencies, Dependency, License}
 
-class Settings2Dependencies {
+class UpdateReportInspector(report: UpdateReport) {
   private val unlicensed = Seq(License(id = Some("Unlicense")))
 
-  def create(reportOption: Option[ConfigurationReport]): Dependencies = {
-    val dependencies = reportOption.map(createDependencies).getOrElse(Seq[Dependency]())
+  def dependencies(configuration: Configuration): Dependencies = {
+    val dependencies = report.configuration(configuration).map(createDependencies).getOrElse(Seq[Dependency]())
     Dependencies(dependencies)
   }
 

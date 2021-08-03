@@ -46,7 +46,7 @@ object BomSbtSettings {
     }
 
   private def bomXml(report: UpdateReport): Elem = {
-    val dependencies = new Settings2Dependencies().create(report.configuration(Compile))
+    val dependencies = new UpdateReportInspector(report).dependencies(Compile)
     new BomBuilder(dependencies).build
   }
 
