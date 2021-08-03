@@ -20,7 +20,7 @@ object BomSbtSettings {
   }
 
   private def makeBomTask(report: UpdateReport): Def.Initialize[Task[sbt.File]] = Def.task[File] {
-    val log: Logger = sLog.value
+    val log = sLog.value
     val bomFile = targetBomFile.value
 
     log.info(s"Creating bom file ${bomFile.getAbsolutePath}")

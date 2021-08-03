@@ -24,9 +24,9 @@ class BomBuilder(dependencies: Dependencies) {
       <group>{d.group}</group>
       <name>{d.name}</name>
       <version>{d.version}</version>
+      <modified>{d.modified}</modified>
       {buildLicenses(d)}
       {buildHashes(d)}
-      <modified>{d.modified}</modified>
     </component>
 
   private def buildLicenses(d: Dependency) =
