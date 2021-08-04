@@ -12,23 +12,25 @@ import scala.xml.{Node, NodeSeq, PrettyPrinter}
   todo customize xml matching in the right way
  */
 class BomBuilderSpec extends AnyWordSpec with Matchers {
+  import BomBuilderSpec._
+
   "bom" should {
     "have a root with all required properties" in {
       val rootWithoutContent = root.copy(child = Seq())
       rootWithoutContent shouldBeSameXml
         <bom
-          xmlns="http://cyclonedx.org/schema/bom/1.0"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          version="1"
-          xsi:schemaLocation="http://cyclonedx.org/schema/bom/1.0 http://cyclonedx.org/schema/bom/1.0">
+        xmlns="http://cyclonedx.org/schema/bom/1.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        version="1"
+        xsi:schemaLocation="http://cyclonedx.org/schema/bom/1.0 http://cyclonedx.org/schema/bom/1.0">
         </bom>
     }
 
     "contains all library components" in {
-      allComponents.foreach(
+      allLibraryComponents.foreach(
         _.attribute("type").get.text shouldBe "library"
       )
-      allComponents.size shouldBe 3
+      allLibraryComponents.size shouldBe 3
     }
   }
 
@@ -50,10 +52,9 @@ class BomBuilderSpec extends AnyWordSpec with Matchers {
       (jacksonComponent \ "modified").text shouldBe "false"
     }
 
-    // todo: produced hashes unexpectedly change
+    // todo: review hash generation to avoid unpredictable values
     "have hashes properties" ignore {
       println(jacksonComponent \ "hashes")
-
       jacksonComponent \ "hashes" shouldBeSameXml
         <hashes>
           <hash alg="MD5">7cb6cc60cda9078bcbe999e8cdf14205</hash>
@@ -78,7 +79,6 @@ class BomBuilderSpec extends AnyWordSpec with Matchers {
         </licenses>
     }
 
-
     "have two licenses with name" in {
       esapiComponent \ "licenses" shouldBeSameXml
         <licenses>
@@ -89,33 +89,6 @@ class BomBuilderSpec extends AnyWordSpec with Matchers {
             <name>{esapi.licenses(1).name.get}</name>
           </license>
         </licenses>
-    }
-  }
-
-  val jackson = model.Dependency(group = "org.codehaus.jackson", name = "jackson-jaxrs", version = "1.9.13", modified = false, file = getResourceFile("/jackson.txt"))
-
-  val pivotal = model.Dependency(group = "org.springframework.boot", name = "spring-boot-legacy", version = "1.0.1.RELEASE", modified = true, licenses = Seq(License(id = Some("Apache-2.0"), name = Some("Apache 2.0"))), file = getResourceFile("/pivotal.txt"))
-
-  val esapi = model.Dependency(group = "org.owasp.esapi", name = "esapi", version = "2.0GA", modified = false, licenses = Seq(
-          License(name = Some("BSD")),
-          License(name = Some("Creative Commons 3.0 BY-SA")),
-        ))
-
-  private val printer = new PrettyPrinter(80, 2)
-
-  private val dependencies = model.Dependencies() :+ jackson :+ pivotal :+ esapi
-  private val builder = new BomBuilder(dependencies)
-  private val root = builder.build
-
-  private val allComponents = root \ "components" \ "component"
-  private val jacksonComponent = allComponents.head
-  private val pivotalComponent = allComponents(1)
-  private val esapiComponent = allComponents(2)
-
-  private def getResourceFile(resourcePath: String) = {
-    getClass.getResource(resourcePath) match {
-      case null => None
-      case url => Some(new File(url.getPath))
     }
   }
 
@@ -130,6 +103,36 @@ class BomBuilderSpec extends AnyWordSpec with Matchers {
     def shouldBeSameXml(that: Node): Assertion = {
       ns.size shouldBe 1
       printer.format(trim(ns.head)) shouldBe printer.format(trim(that))
+    }
+  }
+}
+
+object BomBuilderSpec {
+  private val jackson = model.Dependency(group = "org.codehaus.jackson", name = "jackson-jaxrs", version = "1.9.13", modified = false, file = getResourceFile("/jackson.txt"))
+
+  private val pivotal = model.Dependency(group = "org.springframework.boot", name = "spring-boot-legacy", version = "1.0.1.RELEASE", modified = true, licenses = Seq(License(id = Some("Apache-2.0"), name = Some("Apache 2.0"))), file = getResourceFile("/pivotal.txt"))
+
+  private val esapi = model.Dependency(group = "org.owasp.esapi", name = "esapi", version = "2.0GA", modified = false, licenses = Seq(
+    License(name = Some("BSD")),
+    License(name = Some("Creative Commons 3.0 BY-SA")),
+  ))
+
+  private val printer = new PrettyPrinter(80, 2)
+
+  private val dependencies = model.Dependencies() :+ jackson :+ pivotal :+ esapi
+  private val builder = new BomBuilder(dependencies)
+  private val root = builder.build
+
+  private val allLibraryComponents = root \ "components" \ "component"
+
+  private val jacksonComponent = allLibraryComponents.head
+  private val pivotalComponent = allLibraryComponents(1)
+  private val esapiComponent = allLibraryComponents(2)
+
+  private def getResourceFile(resourcePath: String) = {
+    getClass.getResource(resourcePath) match {
+      case null => None
+      case url => Some(new File(url.getPath))
     }
   }
 }
