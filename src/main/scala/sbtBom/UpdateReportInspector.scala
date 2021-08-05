@@ -28,10 +28,7 @@ class UpdateReportInspector(report: UpdateReport) {
   }
 
   private def mapLicenses(licenses: Seq[(String, Option[String])]): Seq[License] = {
-    if (licenses.isEmpty)
-      unlicensed
-    else
-      licenses.map(mapLicense)
+    licenses.map(mapLicense)
   }
 
   private def mapLicense(license: (String, Option[String])): License = {

@@ -8,6 +8,8 @@ import sbtBom.model.{Dependencies, Dependency, License}
 import scala.xml.{Elem, NodeSeq, Text}
 
 class BomBuilder(dependencies: Dependencies) {
+  private val unlicensed = Seq(License(id = Some("Unlicense")))
+
   def build: Elem =
     <bom xmlns="http://cyclonedx.org/schema/bom/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1" xsi:schemaLocation="http://cyclonedx.org/schema/bom/1.0 http://cyclonedx.org/schema/bom/1.0">
       {buildComponents}
@@ -29,12 +31,12 @@ class BomBuilder(dependencies: Dependencies) {
       {buildHashes(d)}
     </component>
 
-  private def buildLicenses(d: Dependency) =
-    if (d.licenses.nonEmpty) {
-      <licenses>
-        {d.licenses.map(buildLicense)}
-      </licenses>
-    }
+  private def buildLicenses(d: Dependency) = {
+    val licenses = if (d.licenses.nonEmpty) d.licenses else unlicensed
+    <licenses>
+      {licenses.map(buildLicense)}
+    </licenses>
+  }
 
   private def buildLicense(license: License) =
     <license>
@@ -53,7 +55,9 @@ class BomBuilder(dependencies: Dependencies) {
   }
 
   private def buildHash(hash: Hash) =
-    <hash alg={hash.getAlgorithm}>{hash.getValue}</hash>
+    <hash alg={hash.getAlgorithm}>
+      {hash.getValue}
+    </hash>
 
   implicit class OptionElem[T](opt: Option[T]) {
     def xmlMap(e: Elem): NodeSeq =
