@@ -1,39 +1,39 @@
 package sbtBom
 
-import sbt.{Configuration, UpdateReport}
 import sbt.librarymanagement.{ConfigurationReport, ModuleReport}
-import sbtBom.model.{Dependencies, Dependency, License}
+import sbt.{Configuration, UpdateReport}
+import sbtBom.model.{License, LicenseId, Module, Modules}
 
 class UpdateReportInspector(report: UpdateReport) {
-  private val unlicensed = Seq(License(id = Some("Unlicense")))
-
-  def dependencies(configuration: Configuration): Dependencies = {
-    val dependencies = report.configuration(configuration).map(mapDependencies).getOrElse(Seq[Dependency]())
-    Dependencies(dependencies)
+  def dependencies(configuration: Configuration): Modules = {
+    val dependencies = report.configuration(configuration).map(mapDependencies).getOrElse(Seq[Module]())
+    Modules(dependencies)
   }
 
-  private def mapDependencies(configurationReport: ConfigurationReport): Seq[Dependency] = {
+  private def mapDependencies(configurationReport: ConfigurationReport): Seq[Module] =
     configurationReport.modules.map(mapDependency)
-  }
 
-  private def mapDependency(moduleReport: ModuleReport): Dependency = {
-    Dependency(
+  private def mapDependency(moduleReport: ModuleReport): Module =
+    Module(
       moduleReport.module.organization,
       moduleReport.module.name,
       moduleReport.module.revision,
       modified = false,
-      licenses = mapLicenses(moduleReport.licenses),
+      licenses = mapLicenses(mapLicenseIds(moduleReport.licenses)),
       file = None
     )
-  }
 
-  private def mapLicenses(licenses: Seq[(String, Option[String])]): Seq[License] = {
+  private def mapLicenseIds(ids: Seq[(String, Option[String])]): Seq[LicenseId] =
+    ids.map {
+      case (licenseName, licenseUrl) => LicenseId(licenseName, licenseUrl)
+    }
+
+  private def mapLicenses(licenses: Seq[LicenseId]): Seq[License] =
     licenses.map(mapLicense)
-  }
 
-  private def mapLicense(license: (String, Option[String])): License = {
-    license match {
-      case (licenseName, licenseUrl) =>
+  private def mapLicense(licenseId: LicenseId): License =
+    licenseId match {
+      case LicenseId(licenseName, licenseUrl) =>
         val licenseId: Option[String] = licenseUrl
           .flatMap { url =>
             LicensesArchive.findByUrl(url)
@@ -41,5 +41,4 @@ class UpdateReportInspector(report: UpdateReport) {
           .flatMap(_.id)
         License(licenseId, Some(licenseName), Seq())
     }
-  }
 }

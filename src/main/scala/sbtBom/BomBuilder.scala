@@ -3,11 +3,11 @@ package sbtBom
 import org.cyclonedx.CycloneDxSchema
 import org.cyclonedx.model.Hash
 import org.cyclonedx.util.BomUtils
-import sbtBom.model.{Dependencies, Dependency, License}
+import sbtBom.model.{Modules, Module, License}
 
 import scala.xml.{Elem, NodeSeq, Text}
 
-class BomBuilder(dependencies: Dependencies) {
+class BomBuilder(dependencies: Modules) {
   private val unlicensed = Seq(License(id = Some("Unlicense")))
 
   def build: Elem =
@@ -21,7 +21,7 @@ class BomBuilder(dependencies: Dependencies) {
     </components>
   }
 
-  private def buildComponent(d: Dependency) =
+  private def buildComponent(d: Module) =
     <component type="library">
       <group>{d.group}</group>
       <name>{d.name}</name>
@@ -31,7 +31,7 @@ class BomBuilder(dependencies: Dependencies) {
       {buildHashes(d)}
     </component>
 
-  private def buildLicenses(d: Dependency) = {
+  private def buildLicenses(d: Module) = {
     val licenses = if (d.licenses.nonEmpty) d.licenses else unlicensed
     <licenses>
       {licenses.map(buildLicense)}
@@ -43,7 +43,7 @@ class BomBuilder(dependencies: Dependencies) {
       {license.id xmlMap (<id></id>)}{license.name xmlMap (<name></name>)}
     </license>
 
-  private def buildHashes(d: Dependency) = {
+  private def buildHashes(d: Module) = {
     import scala.collection.JavaConverters._
     d.file
       .map { f =>
