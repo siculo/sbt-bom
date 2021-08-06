@@ -3,6 +3,7 @@ package sbtBom
 import sbt.Keys.{sLog, target}
 import sbt.{Def, File, Setting, _}
 import sbtBom.BomSbtPlugin.autoImport._
+import sbtBom.model.Modules
 
 import java.io.FileOutputStream
 import java.nio.channels.Channels
@@ -46,8 +47,7 @@ object BomSbtSettings {
     }
 
   private def bomXml(report: UpdateReport): Elem = {
-    val dependencies = new UpdateReportInspector(report).dependencies(Compile)
-    new BomBuilder(dependencies).build
+    new BomBuilder(Modules(report, Compile)).build
   }
 
   private def writeXmlToFile(xml: Elem,
