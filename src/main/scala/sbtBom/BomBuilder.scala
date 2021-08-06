@@ -3,7 +3,8 @@ package sbtBom
 import org.cyclonedx.CycloneDxSchema
 import org.cyclonedx.model.Hash
 import org.cyclonedx.util.BomUtils
-import sbtBom.model.{Modules, Module, License}
+import sbtBom.licenses.{License, LicensesArchive}
+import sbtBom.model.{LicenseId, Module, Modules}
 
 import scala.xml.{Elem, NodeSeq, Text}
 
@@ -32,7 +33,7 @@ class BomBuilder(dependencies: Modules) {
     </component>
 
   private def buildLicenses(d: Module) = {
-    val licenses = if (d.licenses.nonEmpty) d.licenses else unlicensed
+    val licenses: Seq[License] = if (d.licenseIds.nonEmpty) mapLicenses(d.licenseIds) else unlicensed
     <licenses>
       {licenses.map(buildLicense)}
     </licenses>
@@ -66,4 +67,19 @@ class BomBuilder(dependencies: Modules) {
     def xmlMap(fn: (T) => Elem): NodeSeq =
       opt.map(fn).getOrElse(NodeSeq.Empty)
   }
+
+  private def mapLicenses(licenses: Seq[LicenseId]): Seq[License] =
+    licenses.map(mapLicense)
+
+  private def mapLicense(licenseId: LicenseId): License =
+    licenseId match {
+      case LicenseId(licenseName, licenseUrl) =>
+        val licenseId: Option[String] = licenseUrl
+          .flatMap { url =>
+            LicensesArchive.findByUrl(url)
+          }
+          .flatMap(_.id)
+        License(licenseId, Some(licenseName), Seq())
+    }
+
 }

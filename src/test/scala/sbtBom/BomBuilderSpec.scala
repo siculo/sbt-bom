@@ -1,17 +1,18 @@
 package sbtBom
 
-import java.io.File
 import org.scalatest.Assertion
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import sbtBom.model.License
+import sbtBom.model.LicenseId
 
+import java.io.File
 import scala.xml.{Node, NodeSeq, PrettyPrinter}
 
 /*
   todo customize xml matching in the right way
  */
 class BomBuilderSpec extends AnyWordSpec with Matchers {
+
   import BomBuilderSpec._
 
   "bom" should {
@@ -73,8 +74,7 @@ class BomBuilderSpec extends AnyWordSpec with Matchers {
       pivotalComponent \ "licenses" shouldBeSameXml
         <licenses>
           <license>
-            <id>{pivotal.licenses.head.id.get}</id>
-            <name>{pivotal.licenses.head.name.get}</name>
+            <name>Apache-2.0</name>
           </license>
         </licenses>
     }
@@ -83,10 +83,10 @@ class BomBuilderSpec extends AnyWordSpec with Matchers {
       esapiComponent \ "licenses" shouldBeSameXml
         <licenses>
           <license>
-            <name>{esapi.licenses(0).name.get}</name>
+            <name>BSD</name>
           </license>
           <license>
-            <name>{esapi.licenses(1).name.get}</name>
+            <name>Creative Commons 3.0 BY-SA</name>
           </license>
         </licenses>
     }
@@ -110,11 +110,13 @@ class BomBuilderSpec extends AnyWordSpec with Matchers {
 object BomBuilderSpec {
   private val jackson = model.Module(group = "org.codehaus.jackson", name = "jackson-jaxrs", version = "1.9.13", modified = false, file = getResourceFile("/jackson.txt"))
 
-  private val pivotal = model.Module(group = "org.springframework.boot", name = "spring-boot-legacy", version = "1.0.1.RELEASE", modified = true, licenses = Seq(License(id = Some("Apache-2.0"), name = Some("Apache 2.0"))), file = getResourceFile("/pivotal.txt"))
+  private val pivotal = model.Module(group = "org.springframework.boot", name = "spring-boot-legacy", version = "1.0.1.RELEASE", modified = true, licenseIds = Seq(
+    LicenseId(name = "Apache-2.0", url = None)
+  ), file = getResourceFile("/pivotal.txt"))
 
-  private val esapi = model.Module(group = "org.owasp.esapi", name = "esapi", version = "2.0GA", modified = false, licenses = Seq(
-    License(name = Some("BSD")),
-    License(name = Some("Creative Commons 3.0 BY-SA")),
+  private val esapi = model.Module(group = "org.owasp.esapi", name = "esapi", version = "2.0GA", modified = false, licenseIds = Seq(
+    LicenseId(name = "BSD", url = None),
+    LicenseId(name = "Creative Commons 3.0 BY-SA", url = None),
   ))
 
   private val printer = new PrettyPrinter(80, 2)
