@@ -10,3 +10,8 @@ The aim of this project is to:
 ## how to test the plugin
 
 see: ["exists" test project README.md](src/sbt-test/sbt-bom/exists/README.md)
+
+## changelog
+
+### v0.0.1
+- First release
