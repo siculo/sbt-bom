@@ -1,6 +1,4 @@
-package sbtBom
-
-import sbtBom.model.License
+package sbtBom.licenses
 
 import scala.io.Source
 
