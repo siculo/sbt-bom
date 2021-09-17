@@ -11,9 +11,9 @@ import scala.xml.{Node, NodeSeq, PrettyPrinter}
 /*
   todo customize xml matching in the right way
  */
-class BomBuilderSpec extends AnyWordSpec with Matchers {
+class XmlBomBuilderSpec extends AnyWordSpec with Matchers {
 
-  import BomBuilderSpec._
+  import XmlBomBuilderSpec._
 
   "bom" should {
     "have a root with all required properties" in {
@@ -107,7 +107,7 @@ class BomBuilderSpec extends AnyWordSpec with Matchers {
   }
 }
 
-object BomBuilderSpec {
+object XmlBomBuilderSpec {
   private val jackson = model.Module(group = "org.codehaus.jackson", name = "jackson-jaxrs", version = "1.9.13", modified = false, file = getResourceFile("/jackson.txt"))
 
   private val pivotal = model.Module(group = "org.springframework.boot", name = "spring-boot-legacy", version = "1.0.1.RELEASE", modified = true, licenseIds = Seq(
@@ -122,7 +122,7 @@ object BomBuilderSpec {
   private val printer = new PrettyPrinter(80, 2)
 
   private val dependencies = model.Modules() :+ jackson :+ pivotal :+ esapi
-  private val builder = new BomBuilder(dependencies)
+  private val builder = new XmlBomBuilder(dependencies)
   private val root = builder.build
 
   private val allLibraryComponents = root \ "components" \ "component"

@@ -8,7 +8,7 @@ import sbtBom.model.{LicenseId, Module, Modules}
 
 import scala.xml.{Elem, NodeSeq, Text}
 
-class BomBuilder(dependencies: Modules) {
+class XmlBomBuilder(dependencies: Modules) {
   private val unlicensed = Seq(License(id = Some("Unlicense")))
 
   def build: Elem =

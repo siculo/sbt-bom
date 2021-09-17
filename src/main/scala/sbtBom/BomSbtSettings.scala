@@ -47,7 +47,7 @@ object BomSbtSettings {
     }
 
   private def bomXml(report: UpdateReport): Elem = {
-    new BomBuilder(Modules(report, Compile)).build
+    new XmlBomBuilder(Modules(report, Compile)).build
   }
 
   private def writeXmlToFile(xml: Elem,
