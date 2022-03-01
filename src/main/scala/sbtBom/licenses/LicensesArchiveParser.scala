@@ -1,9 +1,7 @@
-package sbtBom
-
-import sbtBom.model.License
+package sbtBom.licenses
 
 import scala.util.Try
-import scala.xml.{Node, XML}
+import scala.xml.XML
 
 class LicensesArchiveParser(textArchive: String) {
   private lazy val xmlTry = Try {
