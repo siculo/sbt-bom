@@ -2,6 +2,7 @@ package sbtBom
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import sbtBom.licenses.{LicensesArchive, LicensesArchiveParser}
 
 class LicensesArchiveSpec extends AnyWordSpec with Matchers {
   "LicensesArchiveParser" should {

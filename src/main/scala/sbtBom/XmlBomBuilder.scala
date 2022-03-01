@@ -3,11 +3,14 @@ package sbtBom
 import org.cyclonedx.CycloneDxSchema
 import org.cyclonedx.model.Hash
 import org.cyclonedx.util.BomUtils
-import sbtBom.model.{Dependencies, Dependency, License}
+import sbtBom.licenses.{License, LicensesArchive}
+import sbtBom.model.{LicenseId, Module, Modules}
 
 import scala.xml.{Elem, NodeSeq, Text}
 
-class BomBuilder(dependencies: Dependencies) {
+class XmlBomBuilder(dependencies: Modules) {
+  private val unlicensed = Seq(License(id = Some("Unlicense")))
+
   def build: Elem =
     <bom xmlns="http://cyclonedx.org/schema/bom/1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1" xsi:schemaLocation="http://cyclonedx.org/schema/bom/1.0 http://cyclonedx.org/schema/bom/1.0">
       {buildComponents}
@@ -19,7 +22,7 @@ class BomBuilder(dependencies: Dependencies) {
     </components>
   }
 
-  private def buildComponent(d: Dependency) =
+  private def buildComponent(d: Module) =
     <component type="library">
       <group>{d.group}</group>
       <name>{d.name}</name>
@@ -29,19 +32,19 @@ class BomBuilder(dependencies: Dependencies) {
       {buildHashes(d)}
     </component>
 
-  private def buildLicenses(d: Dependency) =
-    if (d.licenses.nonEmpty) {
-      <licenses>
-        {d.licenses.map(buildLicense)}
-      </licenses>
-    }
+  private def buildLicenses(d: Module) = {
+    val licenses: Seq[License] = if (d.licenseIds.nonEmpty) mapLicenses(d.licenseIds) else unlicensed
+    <licenses>
+      {licenses.map(buildLicense)}
+    </licenses>
+  }
 
   private def buildLicense(license: License) =
     <license>
       {license.id xmlMap (<id></id>)}{license.name xmlMap (<name></name>)}
     </license>
 
-  private def buildHashes(d: Dependency) = {
+  private def buildHashes(d: Module) = {
     import scala.collection.JavaConverters._
     d.file
       .map { f =>
@@ -53,7 +56,9 @@ class BomBuilder(dependencies: Dependencies) {
   }
 
   private def buildHash(hash: Hash) =
-    <hash alg={hash.getAlgorithm}>{hash.getValue}</hash>
+    <hash alg={hash.getAlgorithm}>
+      {hash.getValue}
+    </hash>
 
   implicit class OptionElem[T](opt: Option[T]) {
     def xmlMap(e: Elem): NodeSeq =
@@ -62,4 +67,19 @@ class BomBuilder(dependencies: Dependencies) {
     def xmlMap(fn: (T) => Elem): NodeSeq =
       opt.map(fn).getOrElse(NodeSeq.Empty)
   }
+
+  private def mapLicenses(licenses: Seq[LicenseId]): Seq[License] =
+    licenses.map(mapLicense)
+
+  private def mapLicense(licenseId: LicenseId): License =
+    licenseId match {
+      case LicenseId(licenseName, licenseUrl) =>
+        val licenseId: Option[String] = licenseUrl
+          .flatMap { url =>
+            LicensesArchive.findByUrl(url)
+          }
+          .flatMap(_.id)
+        License(licenseId, Some(licenseName), Seq())
+    }
+
 }
