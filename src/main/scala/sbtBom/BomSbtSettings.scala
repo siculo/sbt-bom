@@ -8,16 +8,11 @@ import sbt.Keys.{sLog, target}
 import sbt.librarymanagement.ModuleReport
 import sbt.{Def, File, Setting, _}
 import sbtBom.BomSbtPlugin.autoImport._
-import sbtBom.model.Modules
 
-import java.io.FileOutputStream
-import java.nio.channels.Channels
 import java.nio.charset.Charset
 import java.util
 import java.util.UUID
 import scala.collection.JavaConverters._
-import scala.util.control.Exception.ultimately
-import scala.xml.{Elem, PrettyPrinter}
 
 object BomSbtSettings {
   def projectSettings: Seq[Setting[_]] = {
@@ -117,29 +112,5 @@ object BomSbtSettings {
             component
         }
     }).getOrElse(Seq())
-  }
-
-  private def bomXml(report: UpdateReport): Elem = {
-    new XmlBomBuilder(Modules(report, Compile)).build
-  }
-
-  private def writeXmlToFile(xml: Elem,
-                             encoding: String,
-                             destFile: sbt.File): Unit =
-    writeToFile(xmlToText(xml, encoding), encoding, destFile)
-
-  private def xmlToText(bomContent: Elem, encoding: String): String =
-    "<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>\n" +
-      new PrettyPrinter(80, 2).format(bomContent)
-
-  private def writeToFile(content: String,
-                          encoding: String,
-                          destFile: sbt.File): Unit = {
-    destFile.getParentFile.mkdirs()
-    val fos = new FileOutputStream(destFile.getAbsolutePath)
-    val writer = Channels.newWriter(fos.getChannel, encoding)
-    ultimately(writer.close())(
-      writer.write(content)
-    )
   }
 }
