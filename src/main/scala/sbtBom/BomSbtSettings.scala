@@ -27,7 +27,7 @@ object BomSbtSettings {
 
     log.info(s"Creating bom file ${bomFile.getAbsolutePath}")
 
-    val bom: Bom = new BomExtractor(report, log).bom
+    val bom: Bom = new BomExtractor(schemaVersion, report, log).bom
     val bomText: String = getXmlText(bom, schemaVersion)
     logBomInfo(log, bom)
 
@@ -44,7 +44,7 @@ object BomSbtSettings {
 
       log.info("Creating bom")
 
-      val bom: Bom = new BomExtractor(report, log).bom
+      val bom: Bom = new BomExtractor(schemaVersion, report, log).bom
       val bomText: String = getXmlText(bom, schemaVersion)
       logBomInfo(log, bom)
 
