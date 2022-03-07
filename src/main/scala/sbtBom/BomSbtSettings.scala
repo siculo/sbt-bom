@@ -1,16 +1,17 @@
 package sbtBom
 
+import org.apache.commons.io.FileUtils
+import org.cyclonedx.model.Bom
+import org.cyclonedx.{BomGeneratorFactory, CycloneDxSchema}
 import sbt.Keys.{sLog, target}
 import sbt.{Def, File, Setting, _}
 import sbtBom.BomSbtPlugin.autoImport._
-import sbtBom.model.Modules
 
-import java.io.FileOutputStream
-import java.nio.channels.Channels
-import scala.util.control.Exception.ultimately
-import scala.xml.{Elem, PrettyPrinter}
+import java.nio.charset.Charset
 
 object BomSbtSettings {
+  val schemaVersion: CycloneDxSchema.Version = CycloneDxSchema.Version.VERSION_10
+
   def projectSettings: Seq[Setting[_]] = {
     // val configs = Seq(Compile, Test, IntegrationTest, Runtime, Provided, Optional)
     Seq(
@@ -21,12 +22,16 @@ object BomSbtSettings {
   }
 
   private def makeBomTask(report: UpdateReport): Def.Initialize[Task[sbt.File]] = Def.task[File] {
-    val log = sLog.value
+    val log: Logger = sLog.value
     val bomFile = targetBomFile.value
 
     log.info(s"Creating bom file ${bomFile.getAbsolutePath}")
 
-    writeXmlToFile(bomXml(report), "UTF-8", bomFile)
+    val bom: Bom = new BomExtractor(schemaVersion, report, log).bom
+    val bomText: String = getXmlText(bom, schemaVersion)
+    logBomInfo(log, bom)
+
+    FileUtils.write(bomFile, bomText, Charset.forName("UTF-8"), false)
 
     log.info(s"Bom file ${bomFile.getAbsolutePath} created")
 
@@ -35,38 +40,29 @@ object BomSbtSettings {
 
   private def listBomTask(report: UpdateReport): Def.Initialize[Task[String]] =
     Def.task[String] {
-      val log = sLog.value
+      val log: Logger = sLog.value
 
       log.info("Creating bom")
 
-      val bomText = xmlToText(bomXml(report), "UTF8")
+      val bom: Bom = new BomExtractor(schemaVersion, report, log).bom
+      val bomText: String = getXmlText(bom, schemaVersion)
+      logBomInfo(log, bom)
 
       log.info("Bom created")
 
       bomText
     }
 
-  private def bomXml(report: UpdateReport): Elem = {
-    new XmlBomBuilder(Modules(report, Compile)).build
+  private def logBomInfo(log: Logger, bom: Bom): Unit = {
+    log.info(s"Schema version: ${schemaVersion.getVersionString}")
+    log.info(s"Serial number : ${bom.getSerialNumber}")
   }
 
-  private def writeXmlToFile(xml: Elem,
-                             encoding: String,
-                             destFile: sbt.File): Unit =
-    writeToFile(xmlToText(xml, encoding), encoding, destFile)
-
-  private def xmlToText(bomContent: Elem, encoding: String): String =
-    "<?xml version=\"1.0\" encoding=\"" + encoding + "\"?>\n" +
-      new PrettyPrinter(80, 2).format(bomContent)
-
-  private def writeToFile(content: String,
-                          encoding: String,
-                          destFile: sbt.File): Unit = {
-    destFile.getParentFile.mkdirs()
-    val fos = new FileOutputStream(destFile.getAbsolutePath)
-    val writer = Channels.newWriter(fos.getChannel, encoding)
-    ultimately(writer.close())(
-      writer.write(content)
-    )
+  private def getXmlText(bom: Bom, schemaVersion: CycloneDxSchema.Version) = {
+    val bomGenerator = BomGeneratorFactory.createXml(schemaVersion, bom)
+    bomGenerator.generate
+    val bomText = bomGenerator.toXmlString
+    bomText
   }
+
 }
