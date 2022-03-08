@@ -4,7 +4,7 @@ import org.apache.commons.io.FileUtils
 import org.cyclonedx.model.Bom
 import org.cyclonedx.{BomGeneratorFactory, CycloneDxSchema}
 import sbt.Keys.{sLog, target}
-import sbt.{Def, File, Setting, _}
+import sbt.{Compile, Def, File, Setting, _}
 import sbtBom.BomSbtPlugin.autoImport._
 
 import java.nio.charset.Charset
@@ -27,9 +27,10 @@ object BomSbtSettings {
 
     log.info(s"Creating bom file ${bomFile.getAbsolutePath}")
 
-    val bom: Bom = new BomExtractor(schemaVersion, report, log).bom
+    val params = extractorParams
+    val bom: Bom = new BomExtractor(params, report, log).bom
     val bomText: String = getXmlText(bom, schemaVersion)
-    logBomInfo(log, bom)
+    logBomInfo(log, params, bom)
 
     FileUtils.write(bomFile, bomText, Charset.forName("UTF-8"), false)
 
@@ -44,18 +45,23 @@ object BomSbtSettings {
 
       log.info("Creating bom")
 
-      val bom: Bom = new BomExtractor(schemaVersion, report, log).bom
+      val params = extractorParams
+      val bom: Bom = new BomExtractor(params, report, log).bom
       val bomText: String = getXmlText(bom, schemaVersion)
-      logBomInfo(log, bom)
+      logBomInfo(log, params, bom)
 
       log.info("Bom created")
 
       bomText
     }
 
-  private def logBomInfo(log: Logger, bom: Bom): Unit = {
+  private def extractorParams: BomExtractorParams =
+    BomExtractorParams(schemaVersion, Compile)
+
+  private def logBomInfo(log: Logger, params: BomExtractorParams, bom: Bom): Unit = {
     log.info(s"Schema version: ${schemaVersion.getVersionString}")
     log.info(s"Serial number : ${bom.getSerialNumber}")
+    log.info(s"Scope         : ${params.configuration.id}")
   }
 
   private def getXmlText(bom: Bom, schemaVersion: CycloneDxSchema.Version) = {

@@ -1,7 +1,6 @@
 package sbtBom
 
 import com.github.packageurl.PackageURL
-import org.cyclonedx.CycloneDxSchema
 import org.cyclonedx.model.{Bom, Component, License, LicenseChoice}
 import sbt.librarymanagement.ModuleReport
 import sbt.{Logger, UpdateReport, _}
@@ -11,9 +10,8 @@ import java.util.UUID
 import scala.collection.JavaConverters._
 
 
-class BomExtractor(schemaVersion: CycloneDxSchema.Version, report: UpdateReport, log: Logger) {
+class BomExtractor(settings: BomExtractorParams, report: UpdateReport, log: Logger) {
   private val serialNumber: String = "urn:uuid:" + UUID.randomUUID.toString
-  private val configuration: Configuration = Compile
 
   def bom: Bom = {
     val bom = new Bom
@@ -23,8 +21,17 @@ class BomExtractor(schemaVersion: CycloneDxSchema.Version, report: UpdateReport,
   }
 
   private def components: Seq[Component] = {
+    val configurations = Seq(Compile) // , Provided, Runtime, Test, IntegrationTest
+    configurations.foldLeft(Seq[Component]()) {
+      case (collected, configuration) =>
+        collected ++ componentsForConfiguration(configuration)
+    }
+  }
+
+  private def componentsForConfiguration(configuration: Configuration): Seq[Component] = {
     (report.configuration(configuration) map {
       configurationReport =>
+        log.info(s"Configuration name = ${configurationReport.configuration.name}, modules: ${configurationReport.modules.size}")
         configurationReport.modules.map {
           module =>
             new ComponentExtractor(module).component
@@ -50,7 +57,7 @@ class BomExtractor(schemaVersion: CycloneDxSchema.Version, report: UpdateReport,
       component.setScope(Component.Scope.REQUIRED)
       licenseChoice.foreach(component.setLicenseChoice)
 
-      logComponent(component)
+      // logComponent(component)
 
       component
     }

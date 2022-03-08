@@ -11,4 +11,6 @@ trait BomSbtKeys {
   lazy val makeBom: TaskKey[sbt.File] = taskKey[sbt.File]("Generates bom file which includes all project dependencies")
 
   lazy val listBom: TaskKey[String] = taskKey[String]("Returns a bom which includes all project dependencies")
+
+  lazy val supportedConfigurations: Seq[Configuration] = Seq(Compile, Runtime, Test)
 }
