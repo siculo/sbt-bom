@@ -1,12 +1,13 @@
+ThisBuild / organization := "sbtBom"
+ThisBuild / organizationName := "SBT BOM"
+ThisBuild / version := "0.2.0-SNAPSHOT"
+ThisBuild / scalaVersion := "2.12.8"
+
 lazy val root = (project in file("."))
   .enablePlugins(ScriptedPlugin)
   .settings(
     name := "sbt-bom",
-    organization := "sbtBom",
-    organizationName := "SBT BOM",
-    version := "0.2.0-SNAPSHOT",
     sbtPlugin := true,
-    scalaVersion := "2.12.8",
     libraryDependencies ++= Dependencies.library,
     scriptedLaunchOpts += ("-Dplugin.version=" + version.value),
     scriptedBufferLog := false,
