@@ -10,7 +10,9 @@ lazy val root = (project in file("."))
     name := "sbt-bom",
     sbtPlugin := true,
     libraryDependencies ++= Dependencies.library,
-    scriptedLaunchOpts += ("-Dplugin.version=" + version.value),
+    scriptedLaunchOpts := {
+      scriptedLaunchOpts.value ++ Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
+    },
     scriptedBufferLog := false,
     dependencyOverrides += "org.typelevel" %% "jawn-parser" % "0.14.1"
   )
