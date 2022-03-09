@@ -12,16 +12,7 @@ import java.nio.charset.Charset
 object BomSbtSettings {
   val schemaVersion: CycloneDxSchema.Version = CycloneDxSchema.Version.VERSION_10
 
-  def projectSettings: Seq[Setting[_]] = {
-    // val configs = Seq(Compile, Test, IntegrationTest, Runtime, Provided, Optional)
-    Seq(
-      targetBomFile := target.value / "bom.xml",
-      makeBom := Def.taskDyn(makeBomTask(Classpaths.updateTask.value)).value,
-      listBom := Def.taskDyn(listBomTask(Classpaths.updateTask.value)).value,
-    )
-  }
-
-  private def makeBomTask(report: UpdateReport): Def.Initialize[Task[sbt.File]] = Def.task[File] {
+  def makeBomTask(report: UpdateReport): Def.Initialize[Task[sbt.File]] = Def.task[File] {
     val log: Logger = sLog.value
     val bomFile = targetBomFile.value
 
@@ -39,7 +30,7 @@ object BomSbtSettings {
     bomFile
   }
 
-  private def listBomTask(report: UpdateReport): Def.Initialize[Task[String]] =
+  def listBomTask(report: UpdateReport): Def.Initialize[Task[String]] =
     Def.task[String] {
       val log: Logger = sLog.value
 
