@@ -21,7 +21,7 @@ class BomExtractor(settings: BomExtractorParams, report: UpdateReport, log: Logg
   }
 
   private def components: Seq[Component] = {
-    val configurations = Seq(Compile) // , Provided, Runtime, Test, IntegrationTest
+    val configurations = Seq(Compile, Provided, Runtime, Test, IntegrationTest)
     configurations.foldLeft(Seq[Component]()) {
       case (collected, configuration) =>
         collected ++ componentsForConfiguration(configuration)
