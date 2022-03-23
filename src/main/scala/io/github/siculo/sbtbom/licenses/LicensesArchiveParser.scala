@@ -1,4 +1,4 @@
-package sbtBom.licenses
+package io.github.siculo.sbtbom.licenses
 
 import scala.util.Try
 import scala.xml.XML
