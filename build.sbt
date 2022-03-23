@@ -1,4 +1,4 @@
-ThisBuild / organization := "sbtBom"
+ThisBuild / organization := "io.github.siculo"
 ThisBuild / organizationName := "SBT BOM"
 ThisBuild / version := "0.3.0-SNAPSHOT"
 ThisBuild / scalaVersion := "2.12.8"
