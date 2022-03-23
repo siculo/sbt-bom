@@ -1,6 +1,6 @@
 ThisBuild / organization := "sbtBom"
 ThisBuild / organizationName := "SBT BOM"
-ThisBuild / version := "0.2.0-SNAPSHOT"
+ThisBuild / version := "0.3.0-SNAPSHOT"
 ThisBuild / scalaVersion := "2.12.8"
 ThisBuild / homepage := Some(url("https://github.com/siculo/sbt-bom"))
 
