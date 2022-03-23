@@ -1,14 +1,18 @@
+ThisBuild / organization := "sbtBom"
+ThisBuild / organizationName := "SBT BOM"
+ThisBuild / version := "0.2.0-SNAPSHOT"
+ThisBuild / scalaVersion := "2.12.8"
+ThisBuild / homepage := Some(url("https://github.com/siculo/sbt-bom"))
+
 lazy val root = (project in file("."))
   .enablePlugins(ScriptedPlugin)
   .settings(
     name := "sbt-bom",
-    organization := "sbtBom",
-    organizationName := "SBT BOM",
-    version := "0.2.0-SNAPSHOT",
     sbtPlugin := true,
-    scalaVersion := "2.12.8",
     libraryDependencies ++= Dependencies.library,
-    scriptedLaunchOpts += ("-Dplugin.version=" + version.value),
+    scriptedLaunchOpts := {
+      scriptedLaunchOpts.value ++ Seq("-Xmx1024M", "-Dplugin.version=" + version.value)
+    },
     scriptedBufferLog := false,
     dependencyOverrides += "org.typelevel" %% "jawn-parser" % "0.14.1"
   )
