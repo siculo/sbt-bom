@@ -1,6 +1,6 @@
 package io.github.siculo.sbtbom
 
-import sbt.Keys.target
+import sbt.Keys.{artifact, target, version}
 import sbt._
 
 /**
@@ -21,10 +21,16 @@ object BomSbtPlugin extends AutoPlugin {
 
   import autoImport._
 
-  override lazy val projectSettings: Seq[Setting[_]] =
+  override lazy val projectSettings: Seq[Setting[_]] = {
+    val bomFileName = Def.setting {
+      val artifactId = artifact.value.name
+      val artifactVersion = version.value
+      target.value / s"${artifactId}-${artifactVersion}.bom.xml"
+    }
     Seq(
-      targetBomFile := target.value / "bom.xml",
+      targetBomFile := bomFileName.value,
       makeBom := Def.taskDyn(BomSbtSettings.makeBomTask(Classpaths.updateTask.value)).value,
       listBom := Def.taskDyn(BomSbtSettings.listBomTask(Classpaths.updateTask.value)).value,
     )
+  }
 }

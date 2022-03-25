@@ -1,3 +1,3 @@
 > compile
 > makeBom
-$ exists target/bom.xml
+$ exists target/exists-0.1.bom.xml
