@@ -6,7 +6,11 @@ lazy val root = (project in file("."))
     version := "0.1",
     libraryDependencies ++= Dependencies.library,
     scalaVersion := "2.12.8",
-    check := checkTask.value
+    check := Def.sequential(
+      Compile / clean,
+      Compile / compile,
+      checkTask
+    ).value
   )
 
 lazy val check = taskKey[Unit]("check")
