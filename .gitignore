@@ -44,4 +44,4 @@ npm-debug.log
 .ensime
 .ensime_cache
 
-!/app/com/cervedgroup/c2/api/controller/AdminController.scala
+**/.bsp/sbt.json

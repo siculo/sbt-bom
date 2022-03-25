@@ -1,14 +1,13 @@
-package sbtBom
+package io.github.siculo.sbtbom
 
 import com.github.packageurl.PackageURL
 import org.cyclonedx.model.{Bom, Component, License, LicenseChoice}
 import sbt.librarymanagement.ModuleReport
-import sbt.{Logger, UpdateReport, _}
+import sbt._
 
 import java.util
 import java.util.UUID
 import scala.collection.JavaConverters._
-
 
 class BomExtractor(settings: BomExtractorParams, report: UpdateReport, log: Logger) {
   private val serialNumber: String = "urn:uuid:" + UUID.randomUUID.toString

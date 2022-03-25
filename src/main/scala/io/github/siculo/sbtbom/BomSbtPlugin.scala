@@ -1,4 +1,4 @@
-package sbtBom
+package io.github.siculo.sbtbom
 
 import sbt.Keys.target
 import sbt._
