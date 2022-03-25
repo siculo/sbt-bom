@@ -1,0 +1,4 @@
+> clean
+> compile
+> makeBom
+$ exists target/bom.xml
