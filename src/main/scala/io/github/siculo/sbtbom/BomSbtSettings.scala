@@ -1,11 +1,11 @@
-package sbtBom
+package io.github.siculo.sbtbom
 
 import org.apache.commons.io.FileUtils
 import org.cyclonedx.model.Bom
 import org.cyclonedx.{BomGeneratorFactory, CycloneDxSchema}
-import sbt.Keys.{sLog, target}
-import sbt.{Compile, Def, File, Setting, _}
-import sbtBom.BomSbtPlugin.autoImport._
+import sbt.Keys.sLog
+import sbt.{Compile, Def, File, _}
+import BomSbtPlugin.autoImport._
 
 import java.nio.charset.Charset
 

@@ -1,4 +1,4 @@
-package sbtBom
+package io.github.siculo.sbtbom
 
 import org.cyclonedx.CycloneDxSchema
 import sbt.Configuration
