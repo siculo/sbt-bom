@@ -1,7 +1,11 @@
 package io.github.siculo.sbtbom
 
-import sbt.Keys.{artifact, target, version}
-import sbt._
+import org.cyclonedx.model.Component
+import sbt.Keys.{artifact, configuration, version}
+import sbt.SlashSyntax.RichConfiguration
+import sbt.{Def, _}
+
+import scala.language.postfixOps
 
 /**
  * plugin object
@@ -13,24 +17,32 @@ object BomSbtPlugin extends AutoPlugin {
   override def trigger: PluginTrigger = allRequirements
 
   object autoImport {
-    lazy val targetBomFile: SettingKey[sbt.File] = settingKey[File]("target file to store the generated bom")
-    lazy val makeBom: TaskKey[sbt.File] = taskKey[sbt.File]("Generates bom file which includes all project dependencies")
-    lazy val listBom: TaskKey[String] = taskKey[String]("Returns a bom which includes all project dependencies")
-    lazy val supportedConfigurations: Seq[Configuration] = Seq(Compile, Runtime, Test)
+    lazy val bomFileName: SettingKey[String] = settingKey[String]("bom file name")
+    lazy val makeBom: TaskKey[sbt.File] = taskKey[sbt.File]("Generates bom file")
+    lazy val listBom: TaskKey[String] = taskKey[String]("Returns the bom")
+    lazy val components: TaskKey[Component] = taskKey[Component]("Returns the bom")
+
+
+    lazy val bomConfigurations: TaskKey[Seq[Configuration]] = taskKey[Seq[Configuration]]("Returns the list of configurations whose components are included in the generated bom")
   }
 
   import autoImport._
 
   override lazy val projectSettings: Seq[Setting[_]] = {
-    val bomFileName = Def.setting {
+    val bomFileNameSetting = Def.setting {
       val artifactId = artifact.value.name
       val artifactVersion = version.value
-      target.value / s"${artifactId}-${artifactVersion}.bom.xml"
+      s"${artifactId}-${artifactVersion}.bom.xml"
     }
     Seq(
-      targetBomFile := bomFileName.value,
-      makeBom := Def.taskDyn(BomSbtSettings.makeBomTask(Classpaths.updateTask.value)).value,
-      listBom := Def.taskDyn(BomSbtSettings.listBomTask(Classpaths.updateTask.value)).value,
+      bomFileName := bomFileNameSetting.value,
+      makeBom := Def.taskDyn(BomSbtSettings.makeBomTask(Classpaths.updateTask.value, Compile)).value,
+      listBom := Def.taskDyn(BomSbtSettings.listBomTask(Classpaths.updateTask.value, Compile)).value,
+      Test / makeBom := Def.taskDyn(BomSbtSettings.makeBomTask(Classpaths.updateTask.value, Test)).value,
+      Test / listBom := Def.taskDyn(BomSbtSettings.listBomTask(Classpaths.updateTask.value, Test)).value,
+      IntegrationTest / makeBom := Def.taskDyn(BomSbtSettings.makeBomTask(Classpaths.updateTask.value, IntegrationTest)).value,
+      IntegrationTest / listBom := Def.taskDyn(BomSbtSettings.listBomTask(Classpaths.updateTask.value, IntegrationTest)).value,
+      bomConfigurations := Def.taskDyn(BomSbtSettings.bomConfigurationTask((configuration ?).value)).value
     )
   }
 }
