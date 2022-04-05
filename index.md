@@ -1,37 +1,90 @@
-## Welcome to GitHub Pages
+# sbt-bom
 
-You can use the [editor on GitHub](https://github.com/siculo/sbt-bom/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+*sbt bom.xml exporter*
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+The aim of this project is to:
 
-### Markdown
+- extract a valid [CycloneDx](https://cyclonedx.org/) bom file from sbt projects
+- ensure that the bom file is processable with Software Composition Analysis tools (like Dependency Track)
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+The current development version of the plugin is 0.3.0-SNAPSHOT.
 
-```markdown
-Syntax highlighted code block
+## usage
 
-# Header 1
-## Header 2
-### Header 3
+### project setup
 
-- Bulleted
-- List
+Add the plugin dependency to the file `project/plugins.sbt` using `addSbtPlugin` :
 
-1. Numbered
-2. List
+`addSbtPlugin("io.github.siculo" % "sbt-bom" % "0.3.0-SNAPSHOT")`
 
-**Bold** and _Italic_ and `Code` text
+### BOM creation
 
-[Link](url) and ![Image](src)
+To create the bom for the default configuration use `makeBom` command:
+
+`> sbt makeBom`
+
+This create the BOM file inside the `target` directory. The name of the file created depends on the `name` and `version` property of the current project. For example, if name and version are `myArtifact` and `1.0`, the file name is `myArtifact-1.0.bom.xml`.
+
+### scope selection
+
+It is possible to create the BOM for different scopes, so that all dependencies of the scopes are included in the generated BOM files. The default scope is `Compile`. For now the other supported scopes are `Test` and `IntegrationTest`. To generate the BOM for a certain scope, add the scope as a prefix to the `makeBom` command:
+
+`> sbt Test / makeBom`
+
+`> sbt IntegrationTest / makeBom`
+
+### listing BOM content
+
+The `listBom` command can be used to generate the contents of the BOM without writing it to a file. The BOM is returned as command output. To display the BOM content use: 
+
+`> sbt show listBom`
+
+### configuration
+
+| Setting     | Type        | Description   |
+| ----------- | ----------- | ------------- |
+| bomFileName | String      | bom file name |
+
+Sample configuration:
+
+```scala
+lazy val root = (project in file("."))
+  .settings(
+    bomFileName := "bom.xml",
+    Test / bomFileName := "test.bom.xml",
+    IntegrationTest / bomFileName := "integrationTest.bom.xml",
+  )
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+## CycloneDX support
 
-### Jekyll Themes
+Actually, only version 1.0 of the CycloneDX specification is supported. Support for later versions of the specification, such as for creating BOMs in json format, is expected later.
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/siculo/sbt-bom/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+## Contributing
 
-### Support or Contact
+### testing
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+There are two types of test: unit test done with scalatest and scripted test
+
+### unit test
+
+Unit tests are written using scalatest syntax. Only pure logic classes are tested using these tests.
+
+To run unit tests use the `test` command to run all tests, or `testOnly ...` command specifying the list of test to be
+executed.
+
+### scripted tests
+
+[Scripted](https://www.scala-sbt.org/1.x/docs/Testing-sbt-plugins.html) is a tool that allow you to test sbt plugins.
+For each test it is necessary to create a specially crafted project. These projects are inside src/sbt-test directory.
+
+Scripted tests are run using `scripted` comand.
+
+## changelog
+
+### v0.2.0
+- The cyclonedx-core-java library has been integrated and is used to generate the BOM
+- Removed all old model classes used so far
+
+### v0.1.0
+- First release
