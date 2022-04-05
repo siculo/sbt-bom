@@ -19,11 +19,29 @@ class BomExtractor(settings: BomExtractorParams, report: UpdateReport, log: Logg
     bom
   }
 
-  private def components: Seq[Component] = {
-    val configurations = Seq(Compile, Provided, Runtime, Test, IntegrationTest)
-    configurations.foldLeft(Seq[Component]()) {
+  private def components: Seq[Component] =
+    configurationsForComponents(settings.configuration).foldLeft(Seq[Component]()) {
       case (collected, configuration) =>
         collected ++ componentsForConfiguration(configuration)
+    }
+
+  private def configurationsForComponents(configuration: Configuration): Seq[sbt.Configuration] = {
+    log.info(s"Current configuration = ${configuration.name}")
+    configuration match {
+      case Test =>
+        Seq(Test, Runtime, Compile)
+      case IntegrationTest =>
+        Seq(IntegrationTest, Runtime, Compile)
+      case Runtime =>
+        Seq(Runtime, Compile)
+      case Compile =>
+        Seq(Compile)
+      case Provided =>
+        Seq(Provided)
+      case anyOtherConfiguration: Configuration =>
+        Seq(anyOtherConfiguration)
+      case _ =>
+        Seq()
     }
   }
 
