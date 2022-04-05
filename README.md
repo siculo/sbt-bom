@@ -7,9 +7,62 @@ The aim of this project is to:
 - extract a valid [CycloneDx](https://cyclonedx.org/) bom file from sbt projects
 - ensure that the bom file is processable with Software Composition Analysis tools (like Dependency Track)
 
+The current development version of the plugin is 0.3.0-SNAPSHOT.
+
 ## usage
 
-## testing
+### project setup
+
+Add the plugin dependency to the file `project/plugins.sbt` using `addSbtPlugin` :
+
+`addSbtPlugin("io.github.siculo" % "sbt-bom" % "0.3.0-SNAPSHOT")`
+
+### BOM creation
+
+To create the bom for the default configuration use `makeBom` command:
+
+`> sbt makeBom`
+
+This create the BOM file inside the `target` directory. The name of the file created depends on the `name` and `version` property of the current project. For example, if name and version are `myArtifact` and `1.0`, the file name is `myArtifact-1.0.bom.xml`.
+
+### scope selection
+
+It is possible to create the BOM for different scopes, so that all dependencies of the scopes are included in the generated BOM files. The default scope is `Compile`. For now the other supported scopes are `Test` and `IntegrationTest`. To generate the BOM for a certain scope, add the scope as a prefix to the `makeBom` command:
+
+`> sbt Test / makeBom`
+
+`> sbt IntegrationTest / makeBom`
+
+### listing BOM content
+
+The `listBom` command can be used to generate the contents of the BOM without writing it to a file. The BOM is returned as command output. To display the BOM content use: 
+
+`> sbt show listBom`
+
+### configuration
+
+| Setting     | Type        | Description   |
+| ----------- | ----------- | ------------- |
+| bomFileName | String      | bom file name |
+
+Sample configuration:
+
+```scala
+lazy val root = (project in file("."))
+  .settings(
+    bomFileName := "bom.xml",
+    Test / bomFileName := "test.bom.xml",
+    IntegrationTest / bomFileName := "integrationTest.bom.xml",
+  )
+```
+
+## CycloneDX support
+
+Actually, only version 1.0 of the CycloneDX specification is supported. Support for later versions of the specification, such as for creating BOMs in json format, is expected later.
+
+## Contributing
+
+### testing
 
 There are two types of test: unit test done with scalatest and scripted test
 
