@@ -4,8 +4,8 @@
 
 The aim of this [project](https://siculo.github.io/sbt-bom/) is to:
 
-- extract a valid [CycloneDx](https://cyclonedx.org/) bom file from sbt projects
-- ensure that the bom file is processable with Software Composition Analysis tools (like Dependency Track)
+- extract a valid [CycloneDx](https://cyclonedx.org/) bom file from [sbt](https://www.scala-sbt.org/) projects
+- ensure that the bom file is processable with Software Composition Analysis tools (like [Dependency Track](https://dependencytrack.org/))
 
 The current development version of the plugin is 0.3.0.
 
