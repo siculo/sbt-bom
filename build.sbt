@@ -1,8 +1,11 @@
 ThisBuild / organization := "io.github.siculo"
 ThisBuild / organizationName := "SBT BOM"
-ThisBuild / version := "0.3.0-SNAPSHOT"
+ThisBuild / version := "0.3.0"
 ThisBuild / scalaVersion := "2.12.8"
-ThisBuild / homepage := Some(url("https://github.com/siculo/sbt-bom"))
+ThisBuild / homepage := Project.homepage
+ThisBuild / developers := Project.developers
+ThisBuild / licenses := Project.licenses
+ThisBuild / scmInfo := Project.scmInfo
 
 lazy val root = (project in file("."))
   .enablePlugins(ScriptedPlugin)
