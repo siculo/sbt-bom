@@ -64,7 +64,11 @@ class BomExtractor(settings: BomExtractorParams, report: UpdateReport, log: Logg
       val group = moduleReport.module.organization
       val name = moduleReport.module.name
       val version = moduleReport.module.revision
-
+      /*
+        moduleReport.extraAttributes found keys are:
+          - "info.apiURL"
+          - "info.versionScheme"
+       */
       val component = new Component()
       component.setGroup(group)
       component.setName(name)
@@ -76,6 +80,16 @@ class BomExtractor(settings: BomExtractorParams, report: UpdateReport, log: Logg
       )
       component.setScope(Component.Scope.REQUIRED)
       licenseChoice.foreach(component.setLicenseChoice)
+
+      /*
+        not returned component properties are (BOM version 1.0):
+          - publisher: The person(s) or organization(s) that published the component
+          - hashes
+          - copyright: An optional copyright notice informing users of the underlying claims to copyright ownership in a published work.
+          - cpe: Specifies a well-formed CPE name. See https://nvd.nist.gov/products/cpe
+          - components: Specifies optional sub-components. This is not a dependency tree. It simply provides an optional way to group large sets of components together.
+          - user defined attributes: User-defined attributes may be used on this element as long as they do not have the same name as an existing attribute used by the schema.
+       */
 
       // logComponent(component)
 
@@ -103,7 +117,11 @@ class BomExtractor(settings: BomExtractorParams, report: UpdateReport, log: Logg
 
   private def logComponent(component: Component): Unit = {
     log.info(
-      s""""${component.getGroup}" % "${component.getName}" % "${component.getVersion}", Modified = ${component.getModified}, Component type = ${component.getType.getTypeName}, Scope = ${component.getScope.getScopeName}""".stripMargin)
+      s""""
+         |${component.getGroup}" % "${component.getName}" % "${component.getVersion}",
+         | Modified = ${component.getModified}, Component type = ${component.getType.getTypeName},
+         | Scope = ${component.getScope.getScopeName}
+         | """.stripMargin)
   }
 
 }
