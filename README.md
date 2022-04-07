@@ -82,6 +82,13 @@ Scripted tests are run using `scripted` comand.
 
 ## changelog
 
+### v0.3.0
+- The BOM is generated so that it takes into account the Scope (Compile, Test...) and its dependencies
+- targetBomFile setting replaced by bomFileName
+- default BOM file name is ${artifactId}-${version}.bom.xml
+- GroupId has been changed to io.github.siculo
+- Generated BOM is a valid 1.0 BOM file (removed unespected properties like BOM serial number and license URL)
+
 ### v0.2.0
 - The cyclonedx-core-java library has been integrated and is used to generate the BOM
 - Removed all old model classes used so far
