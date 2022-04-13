@@ -4,10 +4,12 @@
 
 The aim of this [project](https://siculo.github.io/sbt-bom/) is to:
 
-- extract a valid [CycloneDx](https://cyclonedx.org/) bom file from sbt projects
-- ensure that the bom file is processable with Software Composition Analysis tools (like Dependency Track)
+- extract a valid [CycloneDx](https://cyclonedx.org/) bom file from [sbt](https://www.scala-sbt.org/) projects
+- ensure that the bom file is processable with Software Composition Analysis tools (like [Dependency Track](https://dependencytrack.org/))
 
-The current development version of the plugin is 0.3.0-SNAPSHOT, published in the snapshot Sonatype Repository: https://s01.oss.sonatype.org/content/repositories/snapshots
+Current version of the plugin is 0.3.0, published published to the Central Repository.
+
+Snapshot version are published to the [Sonatype Repository](https://s01.oss.sonatype.org/content/repositories/snapshots).
 
 ## usage
 
@@ -15,7 +17,7 @@ The current development version of the plugin is 0.3.0-SNAPSHOT, published in th
 
 Add the plugin dependency to the file `project/plugins.sbt` using `addSbtPlugin` :
 
-`addSbtPlugin("io.github.siculo" % "sbt-bom" % "0.3.0-SNAPSHOT")`
+`addSbtPlugin("io.github.siculo" % "sbt-bom" % "0.3.0")`
 
 ### BOM creation
 
@@ -81,6 +83,13 @@ For each test it is necessary to create a specially crafted project. These proje
 Scripted tests are run using `scripted` comand.
 
 ## changelog
+
+### v0.3.0
+- The BOM is generated so that it takes into account the Scope (Compile, Test...) and its dependencies
+- targetBomFile setting replaced by bomFileName
+- default BOM file name is ${artifactId}-${version}.bom.xml
+- GroupId has been changed to io.github.siculo
+- Generated BOM is a valid 1.0 BOM file (removed unespected properties like BOM serial number and license URL)
 
 ### v0.2.0
 - The cyclonedx-core-java library has been integrated and is used to generate the BOM

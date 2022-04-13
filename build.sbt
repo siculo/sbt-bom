@@ -1,11 +1,13 @@
 ThisBuild / organization := "io.github.siculo"
-ThisBuild / version := "0.3.0-SNAPSHOT"
-ThisBuild / scalaVersion := "2.12.8"
 ThisBuild / organizationName := "Siculo"
 ThisBuild / organizationHomepage := Some(url("https://github.com/siculo"))
-ThisBuild / description := "SBT plugin to generate CycloneDx SBOM files"
-ThisBuild / licenses := List("MIT License" -> new URL("https://opensource.org/licenses/MIT"))
-ThisBuild / homepage := Some(url("https://github.com/example/project"))
+ThisBuild / version := "0.3.0"
+ThisBuild / scalaVersion := "2.12.8"
+ThisBuild / homepage := Project.homepage
+ThisBuild / developers := Project.developers
+ThisBuild / licenses := Project.licenses
+ThisBuild / scmInfo := Project.scmInfo
+ThisBuild / description := Project.description
 
 lazy val root = (project in file("."))
   .enablePlugins(ScriptedPlugin)
