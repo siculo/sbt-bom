@@ -1,6 +1,9 @@
 import sbt._
 
 object Project {
+  lazy val description: String =
+    "SBT plugin to generate CycloneDx SBOM files"
+
   lazy val homepage: Option[URL] =
     Some(url("https://github.com/siculo/sbt-bom"))
 
