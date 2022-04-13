@@ -7,7 +7,7 @@ The aim of this [project](https://siculo.github.io/sbt-bom/) is to:
 - extract a valid [CycloneDx](https://cyclonedx.org/) bom file from sbt projects
 - ensure that the bom file is processable with Software Composition Analysis tools (like Dependency Track)
 
-The current development version of the plugin is 0.3.0-SNAPSHOT.
+The current development version of the plugin is 0.3.0-SNAPSHOT, published in the snapshot Sonatype Repository: https://s01.oss.sonatype.org/content/repositories/snapshots
 
 ## usage
 
