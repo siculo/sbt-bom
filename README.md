@@ -17,7 +17,7 @@ Snapshot version are published to the [Sonatype Repository](https://s01.oss.sona
 
 Add the plugin dependency to the file `project/plugins.sbt` using `addSbtPlugin` :
 
-`addSbtPlugin("io.github.siculo" % "sbt-bom" % "0.3.0")`
+`addSbtPlugin("io.github.siculo" %% "sbt-bom" % "0.3.0")`
 
 ### BOM creation
 
