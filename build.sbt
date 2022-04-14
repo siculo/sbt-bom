@@ -1,7 +1,7 @@
 ThisBuild / organization := Organization.organization
 ThisBuild / organizationName := Organization.organizationName
 ThisBuild / organizationHomepage := Organization.organizationHomepage
-ThisBuild / version := "0.3.0"
+ThisBuild / version := "0.4.0-SNAPSHOT"
 ThisBuild / scalaVersion := "2.12.8"
 ThisBuild / homepage := Project.homepage
 ThisBuild / developers := Project.developers
