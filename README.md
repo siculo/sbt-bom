@@ -7,7 +7,7 @@ The aim of this [project](https://siculo.github.io/sbt-bom/) is to:
 - extract a valid [CycloneDx](https://cyclonedx.org/) bom file from [sbt](https://www.scala-sbt.org/) projects
 - ensure that the bom file is processable with Software Composition Analysis tools (like [Dependency Track](https://dependencytrack.org/))
 
-Current version of the plugin is 0.3.0, published published to the Central Repository.
+Current version of the plugin is 0.3.0, published to the Central Repository.
 
 Snapshot version are published to the [Sonatype Repository](https://s01.oss.sonatype.org/content/repositories/snapshots).
 
@@ -83,6 +83,8 @@ For each test it is necessary to create a specially crafted project. These proje
 Scripted tests are run using `scripted` comand.
 
 ## changelog
+
+### v0.4.0
 
 ### v0.3.0
 - The BOM is generated so that it takes into account the Scope (Compile, Test...) and its dependencies
