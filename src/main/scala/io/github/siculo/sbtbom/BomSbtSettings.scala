@@ -1,23 +1,20 @@
 package io.github.siculo.sbtbom
 
 import io.github.siculo.sbtbom.BomSbtPlugin.autoImport._
-import org.cyclonedx.CycloneDxSchema
 import sbt.Keys.{sLog, target}
-import sbt.{Compile, Configuration, Def, File, IntegrationTest, Provided, Runtime, Test, _}
+import sbt._
 
 object BomSbtSettings {
-  val schemaVersion: CycloneDxSchema.Version = CycloneDxSchema.Version.VERSION_10
-
   def makeBomTask(report: UpdateReport, currentConfiguration: Configuration): Def.Initialize[Task[sbt.File]] = Def.task[File] {
     new MakeBomTask(
-      BomTaskProperties(report, currentConfiguration, sLog.value, schemaVersion),
+      BomTaskProperties(report, currentConfiguration, sLog.value, bomSchemaVersion.value),
       target.value / (currentConfiguration / bomFileName).value
     ).execute
   }
 
   def listBomTask(report: UpdateReport, currentConfiguration: Configuration): Def.Initialize[Task[String]] =
     Def.task[String] {
-      new ListBomTask(BomTaskProperties(report, currentConfiguration, sLog.value, schemaVersion)).execute
+      new ListBomTask(BomTaskProperties(report, currentConfiguration, sLog.value, bomSchemaVersion.value)).execute
     }
 
   def bomConfigurationTask(currentConfiguration: Option[Configuration]): Def.Initialize[Task[Seq[Configuration]]] =
