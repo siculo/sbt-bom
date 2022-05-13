@@ -9,6 +9,7 @@ import sbt._
 import java.util
 import java.util.UUID
 import scala.collection.JavaConverters._
+import scala.collection.immutable
 
 class BomExtractor(settings: BomExtractorParams, report: UpdateReport, log: Logger) {
   private val serialNumber: String = "urn:uuid:" + UUID.randomUUID.toString
@@ -61,9 +62,9 @@ class BomExtractor(settings: BomExtractorParams, report: UpdateReport, log: Logg
 
   class ComponentExtractor(moduleReport: ModuleReport) {
     def component: Component = {
-      val group = moduleReport.module.organization
-      val name = moduleReport.module.name
-      val version = moduleReport.module.revision
+      val group: String = moduleReport.module.organization
+      val name: String = moduleReport.module.name
+      val version: String = moduleReport.module.revision
       /*
         moduleReport.extraAttributes found keys are:
           - "info.apiURL"
@@ -72,7 +73,7 @@ class BomExtractor(settings: BomExtractorParams, report: UpdateReport, log: Logg
       val component = new Component()
       component.setGroup(group)
       component.setName(name)
-      component.setVersion(moduleReport.module.revision)
+      component.setVersion(version)
       component.setModified(false)
       component.setType(Component.Type.LIBRARY)
       component.setPurl(
@@ -97,16 +98,20 @@ class BomExtractor(settings: BomExtractorParams, report: UpdateReport, log: Logg
     }
 
     private def licenseChoice: Option[LicenseChoice] = {
-      if (moduleReport.licenses.isEmpty)
+      val licenses: Seq[model.License] = moduleReport.licenses.map {
+        case (name, mayBeUrl) =>
+          model.License(name, mayBeUrl)
+      }
+      if (licenses.isEmpty)
         None
       else {
         val choice = new LicenseChoice()
-        moduleReport.licenses.foreach {
-          case (name, mayBeUrl) =>
+        licenses.foreach {
+          modelLicense =>
             val license = new License()
-            license.setName(name)
+            license.setName(modelLicense.name)
             if (settings.schemaVersion != CycloneDxSchema.Version.VERSION_10) {
-              mayBeUrl.foreach(license.setUrl)
+              modelLicense.url.foreach(license.setUrl)
             }
             choice.addLicense(license)
         }
