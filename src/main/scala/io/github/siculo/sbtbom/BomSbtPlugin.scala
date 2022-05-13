@@ -37,7 +37,7 @@ object BomSbtPlugin extends AutoPlugin {
     }
     Seq(
       bomFileName := bomFileNameSetting.value,
-      bomSchemaVersion := "1.0",
+      bomSchemaVersion := defaultSupportedVersion.getVersionString,
       makeBom := Def.taskDyn(BomSbtSettings.makeBomTask(Classpaths.updateTask.value, Compile)).value,
       listBom := Def.taskDyn(BomSbtSettings.listBomTask(Classpaths.updateTask.value, Compile)).value,
       Test / makeBom := Def.taskDyn(BomSbtSettings.makeBomTask(Classpaths.updateTask.value, Test)).value,
