@@ -1,8 +1,4 @@
-import scala.xml.XML
-import Dependencies._
 import sbt.Keys._
-
-import scala.util.{Try, Success, Failure}
 
 lazy val root = (project in file("."))
   .settings(
