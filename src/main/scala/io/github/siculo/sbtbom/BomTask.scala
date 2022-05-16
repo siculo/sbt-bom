@@ -17,10 +17,10 @@ abstract class BomTask[T](protected val properties: BomTaskProperties) {
   def execute: T
 
   protected def getBomText: String = {
-    val params: BomExtractorParams = extractorParams(currentConfiguration)
-    val bom: Bom = new BomExtractor(params, report, log).bom
+    val context: ExtractorContext = ExtractorContext(schemaVersion, currentConfiguration, log)
+    val bom: Bom = new BomExtractor(context, report).extract
     val bomText: String = getXmlText(bom)
-    logBomInfo(params, bom)
+    logBomInfo(context, bom)
     bomText
   }
 
@@ -48,9 +48,6 @@ abstract class BomTask[T](protected val properties: BomTaskProperties) {
     throw new BomError(message)
   }
 
-  private def extractorParams(currentConfiguration: Configuration): BomExtractorParams =
-    BomExtractorParams(schemaVersion, currentConfiguration)
-
   private def getXmlText(bom: Bom): String = {
     val bomGenerator = BomGeneratorFactory.createXml(schemaVersion, bom)
     bomGenerator.generate
@@ -58,7 +55,7 @@ abstract class BomTask[T](protected val properties: BomTaskProperties) {
     bomText
   }
 
-  protected def logBomInfo(params: BomExtractorParams, bom: Bom): Unit = {
+  protected def logBomInfo(params: ExtractorContext, bom: Bom): Unit = {
     log.info(s"Schema version: ${schemaVersion.getVersionString}")
     // log.info(s"Serial number : ${bom.getSerialNumber}")
     log.info(s"Scope         : ${params.configuration.id}")
