@@ -1,5 +1,6 @@
-package io.github.siculo.sbtbom
+package io.github.siculo.sbtbom.extractor
 
+import io.github.siculo.sbtbom.model._
 import org.cyclonedx.CycloneDxSchema
 import org.cyclonedx.model.{Bom, Component}
 import sbt._
@@ -8,6 +9,7 @@ import java.util.UUID
 import scala.collection.JavaConverters._
 
 class BomExtractor(context: ExtractorContext, source: UpdateReport) {
+
   import context._
 
   private val serialNumber: String = "urn:uuid:" + UUID.randomUUID.toString
@@ -51,9 +53,9 @@ class BomExtractor(context: ExtractorContext, source: UpdateReport) {
     (source.configuration(configuration) map {
       configurationReport =>
         log.info(s"Configuration name = ${configurationReport.configuration.name}, modules: ${configurationReport.modules.size}")
-        configurationReport.modules.map {
+        Module.fromModuleReports(configurationReport.modules).map {
           module =>
-            new ComponentExtractor(context, module).extract
+            new LibraryComponentExtractor(context, module).extract
         }
     }).getOrElse(Seq())
   }
