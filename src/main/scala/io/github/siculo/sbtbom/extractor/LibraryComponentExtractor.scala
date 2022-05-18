@@ -1,13 +1,13 @@
 package io.github.siculo.sbtbom.extractor
 
 import com.github.packageurl.PackageURL
-import io.github.siculo.sbtbom.model.Module
+import io.github.siculo.sbtbom.ReportModel._
 import org.cyclonedx.CycloneDxSchema
 import org.cyclonedx.model.{Component, License, LicenseChoice}
 
 import java.util
 
-class LibraryComponentExtractor(context: ExtractorContext, source: Module) {
+class LibraryComponentExtractor(setup: ExtractorSetup, dependency: Dependency) {
   val componentType = Component.Type.LIBRARY
   /*
     todo evaluate
@@ -42,26 +42,24 @@ class LibraryComponentExtractor(context: ExtractorContext, source: Module) {
         </components>
   */
 
-  import context._
-
   def extract: Component = {
     val component = new Component()
-    component.setGroup(source.group)
-    component.setName(source.name)
-    component.setVersion(source.version)
-    component.setModified(source.modified)
+    component.setGroup(dependency.group)
+    component.setName(dependency.name)
+    component.setVersion(dependency.version)
+    component.setModified(dependency.modified)
     component.setType(Component.Type.LIBRARY)
     component.setPurl(
-      new PackageURL(PackageURL.StandardTypes.MAVEN, source.group, source.name, source.version, new util.TreeMap(), null).canonicalize()
+      new PackageURL(PackageURL.StandardTypes.MAVEN, dependency.group, dependency.name, dependency.version, new util.TreeMap(), null).canonicalize()
     )
     component.setScope(Component.Scope.REQUIRED)
-    if (source.licenses.nonEmpty) {
+    if (dependency.licenses.nonEmpty) {
       val choice = new LicenseChoice()
-      source.licenses.foreach {
+      dependency.licenses.foreach {
         modelLicense =>
           val license = new License()
           license.setName(modelLicense.name)
-          if (schemaVersion != CycloneDxSchema.Version.VERSION_10) {
+          if (setup.schemaVersion != CycloneDxSchema.Version.VERSION_10) {
             modelLicense.url.foreach(license.setUrl)
           }
           choice.addLicense(license)
@@ -72,7 +70,7 @@ class LibraryComponentExtractor(context: ExtractorContext, source: Module) {
   }
 
   private def logComponent(component: Component): Unit = {
-    log.info(
+    setup.log.info(
       s""""
          |${component.getGroup}" % "${component.getName}" % "${component.getVersion}",
          | Modified = ${component.getModified}, Component type = ${component.getType.getTypeName},

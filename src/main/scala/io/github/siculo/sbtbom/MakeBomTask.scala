@@ -2,9 +2,9 @@ package io.github.siculo.sbtbom
 
 import sbt._
 
-class MakeBomTask(properties: BomTaskProperties,
+class MakeBomTask(params: TaskParams,
                   bomFile: File)
-  extends BomTask[File](properties) {
+  extends BomTask[File](params) {
 
   override def execute: File = {
     log.info(s"Creating bom file ${bomFile.getAbsolutePath}")
