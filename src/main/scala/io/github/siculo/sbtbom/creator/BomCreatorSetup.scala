@@ -1,4 +1,4 @@
-package io.github.siculo.sbtbom.extractor
+package io.github.siculo.sbtbom.creator
 
 import sbt._
 import org.cyclonedx.CycloneDxSchema

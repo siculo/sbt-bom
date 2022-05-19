@@ -1,4 +1,4 @@
-package io.github.siculo.sbtbom.extractor
+package io.github.siculo.sbtbom.creator
 
 import com.github.packageurl.PackageURL
 import io.github.siculo.sbtbom.ReportModel._

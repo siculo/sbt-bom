@@ -2,7 +2,7 @@ package io.github.siculo.sbtbom
 
 import io.github.siculo.sbtbom.PluginConstants._
 import io.github.siculo.sbtbom.ReportModel._
-import io.github.siculo.sbtbom.extractor._
+import io.github.siculo.sbtbom.creator._
 import org.apache.commons.io.FileUtils
 import org.cyclonedx.model.Bom
 import org.cyclonedx.parsers.XmlParser
