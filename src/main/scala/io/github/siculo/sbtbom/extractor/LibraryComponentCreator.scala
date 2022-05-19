@@ -7,7 +7,7 @@ import org.cyclonedx.model.{Component, License, LicenseChoice}
 
 import java.util
 
-class LibraryComponentExtractor(setup: ExtractorSetup, dependency: Dependency) {
+class LibraryComponentCreator(setup: BomCreatorSetup, dependency: Dependency) {
   val componentType = Component.Type.LIBRARY
   /*
     todo evaluate
@@ -42,7 +42,7 @@ class LibraryComponentExtractor(setup: ExtractorSetup, dependency: Dependency) {
         </components>
   */
 
-  def extract: Component = {
+  def create: Component = {
     val component = new Component()
     component.setGroup(dependency.group)
     component.setName(dependency.name)

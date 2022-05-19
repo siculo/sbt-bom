@@ -4,18 +4,16 @@ import io.github.siculo.sbtbom.ReportModel._
 import sbt._
 import sbt.librarymanagement.ModuleReport
 
-object ReportFacade {
+object ReportModelExtraction {
   implicit class UpdateReportOps(updateReport: UpdateReport) {
-    def dependencyReport(configuration: Configuration): DependencyReport =
+    def asDependencyReportForConfiguration(configuration: Configuration): DependencyReport =
       configurationReports(configuration.dependencyConfigurations).foldLeft(DependencyReport()) {
         case (collected, configurationReport) =>
-          collected + configurationReport.model
+          collected + configurationReport.asDependencyReport
       }
 
     private def configurationReports(configuration: Seq[Configuration]): Seq[ConfigurationReport] =
-      configuration.map {
-        updateReport.configuration(_)
-      }.flatten
+      configuration.flatMap(updateReport.configuration(_))
   }
 
   implicit class ConfigurationOps(configuration: Configuration) {
@@ -40,8 +38,8 @@ object ReportFacade {
   }
 
   implicit class ConfigurationReportOps(configuratioReport: ConfigurationReport) {
-    def model: DependencyReport =
-      DependencyReport(dependencies = configuratioReport.modules.map(_.model))
+    def asDependencyReport: DependencyReport =
+      DependencyReport(dependencies = configuratioReport.modules.map(_.asDependency))
   }
 
   /*
@@ -50,7 +48,7 @@ object ReportFacade {
       - "info.versionScheme"
    */
   implicit class ModuleReportOps(moduleReport: ModuleReport) {
-    def model: Dependency = {
+    def asDependency: Dependency = {
       Dependency(
         group = moduleReport.module.organization,
         name = moduleReport.module.name,

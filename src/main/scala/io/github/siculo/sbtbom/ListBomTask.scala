@@ -1,6 +1,6 @@
 package io.github.siculo.sbtbom
 
-class ListBomTask(params: TaskParams) extends BomTask[String](params) {
+class ListBomTask(taskSetup: TaskSetup) extends BomTask[String](taskSetup) {
   override def execute: String = {
     log.info("Creating bom")
     val bomText = getBomText

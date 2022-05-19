@@ -21,10 +21,6 @@ object BomSbtPlugin extends AutoPlugin {
     lazy val bomSchemaVersion: SettingKey[String] = settingKey[String](s"bom schema version; must be one of ${supportedVersionsDescr}; default is ${defaultSupportedVersionDescr}")
     lazy val makeBom: TaskKey[sbt.File] = taskKey[sbt.File]("Generates bom file")
     lazy val listBom: TaskKey[String] = taskKey[String]("Returns the bom")
-    lazy val components: TaskKey[Component] = taskKey[Component]("Returns the bom")
-
-
-    lazy val bomConfigurations: TaskKey[Seq[Configuration]] = taskKey[Seq[Configuration]]("Returns the list of configurations whose components are included in the generated bom")
   }
 
   import autoImport._
@@ -44,7 +40,6 @@ object BomSbtPlugin extends AutoPlugin {
       Test / listBom := Def.taskDyn(BomSbtSettings.listBomTask(Classpaths.updateTask.value, Test)).value,
       IntegrationTest / makeBom := Def.taskDyn(BomSbtSettings.makeBomTask(Classpaths.updateTask.value, IntegrationTest)).value,
       IntegrationTest / listBom := Def.taskDyn(BomSbtSettings.listBomTask(Classpaths.updateTask.value, IntegrationTest)).value,
-      bomConfigurations := Def.taskDyn(BomSbtSettings.bomConfigurationTask((configuration ?).value)).value
     )
   }
 }

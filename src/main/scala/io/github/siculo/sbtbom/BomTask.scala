@@ -8,23 +8,23 @@ import org.cyclonedx.model.Bom
 import org.cyclonedx.parsers.XmlParser
 import org.cyclonedx.{BomGeneratorFactory, CycloneDxSchema}
 import sbt._
-import _root_.io.github.siculo.sbtbom.ReportFacade._
+import _root_.io.github.siculo.sbtbom.ReportModelExtraction._
 
 import java.nio.charset.Charset
 import scala.collection.JavaConverters._
 
-case class TaskParams(report: UpdateReport, currentConfiguration: Configuration, log: Logger, schemaVersion: String)
+case class TaskSetup(report: UpdateReport, currentConfiguration: Configuration, log: Logger, schemaVersion: String)
 
-abstract class BomTask[T](protected val params: TaskParams) {
+abstract class BomTask[T](protected val taskSetup: TaskSetup) {
 
   def execute: T
 
   protected def getBomText: String = {
-    val setup: ExtractorSetup = ExtractorSetup(schemaVersion, currentConfiguration, log)
-    val dependencyReport: DependencyReport = report.dependencyReport(currentConfiguration)
-    val bom: Bom = new BomExtractor(setup, dependencyReport).extract
+    val creatorSetup: BomCreatorSetup = BomCreatorSetup(schemaVersion, currentConfiguration, log)
+    val dependencyReport: DependencyReport = report.asDependencyReportForConfiguration(currentConfiguration)
+    val bom: Bom = new BomCreator(creatorSetup, dependencyReport).create
     val bomText: String = getXmlText(bom)
-    logBomInfo(setup, bom)
+    logBomInfo(creatorSetup, bom)
     bomText
   }
 
@@ -33,8 +33,8 @@ abstract class BomTask[T](protected val params: TaskParams) {
   }
 
   protected def validateBomFile(bomFile: File): Unit = {
-    val parser = new XmlParser()
-    val exceptions = parser.validate(bomFile, schemaVersion).asScala
+    val cyclonedxParser = new XmlParser()
+    val exceptions = cyclonedxParser.validate(bomFile, schemaVersion).asScala
     if (exceptions.nonEmpty) {
       val message = s"The BOM file ${bomFile.getAbsolutePath} does not conform to the CycloneDX BOM standard as defined by the XSD"
       log.error(s"$message:")
@@ -53,29 +53,30 @@ abstract class BomTask[T](protected val params: TaskParams) {
   }
 
   private def getXmlText(bom: Bom): String = {
-    val bomGenerator = BomGeneratorFactory.createXml(schemaVersion, bom)
-    bomGenerator.generate
-    val bomText = bomGenerator.toXmlString
-    bomText
+    val cyclonedxBomGenerator = BomGeneratorFactory.createXml(schemaVersion, bom)
+    cyclonedxBomGenerator.generate
+    cyclonedxBomGenerator.toXmlString
   }
 
-  protected def logBomInfo(setup: ExtractorSetup, bom: Bom): Unit = {
+  protected def logBomInfo(creatorSetup: BomCreatorSetup, bom: Bom): Unit = {
     log.info(s"Schema version: ${schemaVersion.getVersionString}")
-    // log.info(s"Serial number : ${bom.getSerialNumber}")
-    log.info(s"Scope         : ${setup.configuration.id}")
+    if (creatorSetup.schemaVersion != CycloneDxSchema.Version.VERSION_10) {
+      log.info(s"Serial number : ${bom.getSerialNumber}")
+    }
+    log.info(s"Scope         : ${creatorSetup.configuration.id}")
   }
 
-  protected def report: UpdateReport = params.report
+  protected val report: UpdateReport = taskSetup.report
 
-  protected def currentConfiguration: Configuration = params.currentConfiguration
+  protected val currentConfiguration: Configuration = taskSetup.currentConfiguration
 
-  protected def log: Logger = params.log
+  protected val log: Logger = taskSetup.log
 
   protected lazy val schemaVersion: CycloneDxSchema.Version =
-    supportedVersions.find(_.getVersionString == params.schemaVersion) match {
+    supportedVersions.find(_.getVersionString == taskSetup.schemaVersion) match {
       case Some(foundVersion) => foundVersion
       case None =>
-        val message = s"Unsupported schema version ${params.schemaVersion}"
+        val message = s"Unsupported schema version ${taskSetup.schemaVersion}"
         log.error(message)
         throw new TaskError(message)
     }
