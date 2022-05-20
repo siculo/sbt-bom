@@ -4,6 +4,8 @@ import io.github.siculo.sbtbom.ReportModel._
 import sbt._
 import sbt.librarymanagement.ModuleReport
 
+import scala.collection.immutable
+
 object ReportModelExtraction {
   implicit class UpdateReportOps(updateReport: UpdateReport) {
     def asDependencyReportForConfiguration(configuration: Configuration): DependencyReport =
@@ -57,8 +59,19 @@ object ReportModelExtraction {
         licenses = moduleReport.licenses.map {
           case (name, mayBeUrl) =>
             License(name, mayBeUrl)
-        }
+        },
+        filePaths = artifactPaths(moduleReport)
       )
     }
+  }
+
+  private def artifactPaths(moduleReport: ModuleReport): immutable.Seq[String] = {
+    moduleReport.artifacts.map {
+      case (_, file) =>
+        file
+    }.filter {
+      file =>
+        file.exists() && file.isFile
+    }.map(_.getAbsolutePath)
   }
 }

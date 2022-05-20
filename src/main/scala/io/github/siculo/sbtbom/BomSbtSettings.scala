@@ -6,14 +6,18 @@ import sbt._
 
 object BomSbtSettings {
   def makeBomTask(report: UpdateReport, currentConfiguration: Configuration): Def.Initialize[Task[sbt.File]] = Def.task[File] {
+    val reportFile = reportFileName.value.map(target.value / _)
     new MakeBomTask(
-      TaskSetup(report, currentConfiguration, sLog.value, bomSchemaVersion.value),
+      TaskSetup(report, currentConfiguration, bomSchemaVersion.value, reportFile, sLog.value),
       target.value / (currentConfiguration / bomFileName).value
     ).execute
   }
 
   def listBomTask(report: UpdateReport, currentConfiguration: Configuration): Def.Initialize[Task[String]] =
     Def.task[String] {
-      new ListBomTask(TaskSetup(report, currentConfiguration, sLog.value, bomSchemaVersion.value)).execute
+      val reportFile = reportFileName.value.map(target.value / _)
+      new ListBomTask(
+        TaskSetup(report, currentConfiguration, bomSchemaVersion.value, reportFile, sLog.value)
+      ).execute
     }
 }

@@ -1,5 +1,8 @@
 package io.github.siculo.sbtbom
 
+import _root_.io.github.siculo.sbtbom.ReportModelExtraction._
+import io.circe.generic.auto._
+import io.circe.syntax._
 import io.github.siculo.sbtbom.PluginConstants._
 import io.github.siculo.sbtbom.ReportModel._
 import io.github.siculo.sbtbom.creator._
@@ -8,12 +11,15 @@ import org.cyclonedx.model.Bom
 import org.cyclonedx.parsers.XmlParser
 import org.cyclonedx.{BomGeneratorFactory, CycloneDxSchema}
 import sbt._
-import _root_.io.github.siculo.sbtbom.ReportModelExtraction._
 
 import java.nio.charset.Charset
 import scala.collection.JavaConverters._
 
-case class TaskSetup(report: UpdateReport, currentConfiguration: Configuration, log: Logger, schemaVersion: String)
+case class TaskSetup(report: sbt.UpdateReport,
+                     currentConfiguration: sbt.Configuration,
+                     schemaVersion: String,
+                     reportFile: Option[File],
+                     log: sbt.Logger)
 
 abstract class BomTask[T](protected val taskSetup: TaskSetup) {
 
@@ -23,9 +29,13 @@ abstract class BomTask[T](protected val taskSetup: TaskSetup) {
     val creatorSetup: BomCreatorSetup = BomCreatorSetup(schemaVersion, currentConfiguration, log)
     val dependencyReport: DependencyReport = report.asDependencyReportForConfiguration(currentConfiguration)
     val bom: Bom = new BomCreator(creatorSetup, dependencyReport).create
-    val bomText: String = getXmlText(bom)
     logBomInfo(creatorSetup, bom)
-    bomText
+    taskSetup.reportFile.foreach {
+      file =>
+        log.info(s"Creating report file ${file.getPath}")
+        writeToFile(file, dependencyReport.asJson.toString())
+    }
+    getXmlText(bom)
   }
 
   protected def writeToFile(destFile: File, text: String): Unit = {

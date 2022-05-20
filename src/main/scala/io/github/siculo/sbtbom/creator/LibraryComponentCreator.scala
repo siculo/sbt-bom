@@ -3,19 +3,19 @@ package io.github.siculo.sbtbom.creator
 import com.github.packageurl.PackageURL
 import io.github.siculo.sbtbom.ReportModel._
 import org.cyclonedx.CycloneDxSchema
-import org.cyclonedx.model.{Component, License, LicenseChoice}
+import org.cyclonedx.model.{Component, Hash, License, LicenseChoice}
+import org.cyclonedx.util.BomUtils
 
+import java.io.File
 import java.util
+import scala.collection.JavaConverters._
 
 class LibraryComponentCreator(setup: BomCreatorSetup, dependency: Dependency) {
   val componentType = Component.Type.LIBRARY
+
   /*
     todo evaluate
         <publisher>The person(s) or organization(s) that published the component</publisher> [evaluate]
-    done
-        <group>org.scala-lang</group>
-        <name>scala-library (!)</name>
-        <version>2.13.8 (!)</version>
     todo may be ok
         <scope>required</scope>
     todo
@@ -32,8 +32,6 @@ class LibraryComponentCreator(setup: BomCreatorSetup, dependency: Dependency) {
     todo evaluate
         <copyright>optional copyright</copyright> [evaluate]
         <cpe>@https://nvd.nist.gov/products/cpe</cpe> [evaluate]
-    done
-        <purl>pkg:maven/org.scala-lang/scala-library@2.13.8</purl>
     todo evaluate
         <modified>false!(derivative of the original or not)</modified>
     todo evaluate subcomponent
@@ -53,6 +51,7 @@ class LibraryComponentCreator(setup: BomCreatorSetup, dependency: Dependency) {
       new PackageURL(PackageURL.StandardTypes.MAVEN, dependency.group, dependency.name, dependency.version, new util.TreeMap(), null).canonicalize()
     )
     component.setScope(Component.Scope.REQUIRED)
+    component.setHashes(hashes().asJava)
     if (dependency.licenses.nonEmpty) {
       val choice = new LicenseChoice()
       dependency.licenses.foreach {
@@ -68,6 +67,12 @@ class LibraryComponentCreator(setup: BomCreatorSetup, dependency: Dependency) {
     }
     component
   }
+
+  private def hashes(): Seq[Hash] =
+    dependency.filePaths.flatMap {
+      filePath =>
+        BomUtils.calculateHashes(new File(filePath), setup.schemaVersion).asScala
+    }
 
   private def logComponent(component: Component): Unit = {
     setup.log.info(

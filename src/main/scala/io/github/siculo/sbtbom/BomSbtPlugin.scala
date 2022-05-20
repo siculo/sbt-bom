@@ -1,8 +1,7 @@
 package io.github.siculo.sbtbom
 
 import io.github.siculo.sbtbom.PluginConstants._
-import org.cyclonedx.model.Component
-import sbt.Keys.{artifact, configuration, version}
+import sbt.Keys.{artifact, version}
 import sbt.{Def, _}
 
 import scala.language.postfixOps
@@ -18,6 +17,7 @@ object BomSbtPlugin extends AutoPlugin {
 
   object autoImport {
     lazy val bomFileName: SettingKey[String] = settingKey[String]("bom file name")
+    lazy val reportFileName: SettingKey[Option[String]] = settingKey[Option[String]]("dependency report file name")
     lazy val bomSchemaVersion: SettingKey[String] = settingKey[String](s"bom schema version; must be one of ${supportedVersionsDescr}; default is ${defaultSupportedVersionDescr}")
     lazy val makeBom: TaskKey[sbt.File] = taskKey[sbt.File]("Generates bom file")
     lazy val listBom: TaskKey[String] = taskKey[String]("Returns the bom")
@@ -33,6 +33,7 @@ object BomSbtPlugin extends AutoPlugin {
     }
     Seq(
       bomFileName := bomFileNameSetting.value,
+      reportFileName := None,
       bomSchemaVersion := defaultSupportedVersion.getVersionString,
       makeBom := Def.taskDyn(BomSbtSettings.makeBomTask(Classpaths.updateTask.value, Compile)).value,
       listBom := Def.taskDyn(BomSbtSettings.listBomTask(Classpaths.updateTask.value, Compile)).value,

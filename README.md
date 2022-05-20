@@ -82,6 +82,8 @@ For each test it is necessary to create a specially crafted project. These proje
 
 Scripted tests are run using `scripted` comand.
 
+Note: Scripted tests to be run successfully require Java 11.
+
 ## changelog
 
 ### v0.4.0

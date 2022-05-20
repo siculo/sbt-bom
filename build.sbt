@@ -19,6 +19,7 @@ lazy val root = (project in file("."))
       scriptedLaunchOpts.value ++ Seq("-Xmx1024M", "-Dplugin.version=" + version.value, "-Dplugin.organization=" + organization.value)
     },
     scriptedBufferLog := false,
+    javacOptions ++= Seq("-source", "11"),
     dependencyOverrides += "org.typelevel" %% "jawn-parser" % "0.14.1"
   )
 

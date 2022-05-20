@@ -20,7 +20,10 @@ lazy val checkTask = Def.task {
   s.log.info("Verifying bom content...")
   val bomFile = (IntegrationTest / makeBom).value
   val context = thisProject.value
-  val expected = XML.loadFile(file(s"${context.base}/etc/bom.xml"))
+  val expectedFile = file(s"${context.base}/etc/bom.xml")
+  s.log.info(s"Comparing expected file ${bomFile.getAbsolutePath}")
+  s.log.info(s"with actual file ${expectedFile.getAbsolutePath}")
+  val expected = XML.loadFile(expectedFile)
   s.log.info(s"${bomFile.getPath}")
   val actual = XML.loadFile(bomFile)
   val expectedComponents = expected \ "components"

@@ -7,7 +7,8 @@ object ReportModel {
                         name: String,
                         version: String,
                         modified: Boolean,
-                        licenses: Seq[License])
+                        licenses: Seq[License],
+                        filePaths: Seq[String])
 
   case class DependencyReport(dependencies: Seq[Dependency] = Seq.empty) {
     def +(that: DependencyReport): DependencyReport = DependencyReport(this.dependencies ++ that.dependencies)
