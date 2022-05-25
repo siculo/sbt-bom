@@ -2,6 +2,7 @@ package io.github.siculo.sbtbom.creator
 
 import com.github.packageurl.PackageURL
 import io.github.siculo.sbtbom.ReportModel._
+import io.github.siculo.sbtbom.licenses.{LicenseArchive, Model}
 import org.cyclonedx.CycloneDxSchema
 import org.cyclonedx.model.{Component, Hash, License, LicenseChoice}
 import org.cyclonedx.util.BomUtils
@@ -53,10 +54,18 @@ class LibraryComponentCreator(setup: BomCreatorSetup, dependency: Dependency) {
       dependency.licenses.foreach {
         modelLicense =>
           val license = new License()
-          modelLicense.url.toSeq
-          license.setName(modelLicense.name)
-          if (setup.schemaVersion != CycloneDxSchema.Version.VERSION_10) {
-            modelLicense.url.foreach(license.setUrl)
+          modelLicense.url.foreach {
+            licenseUrl =>
+              LicenseArchive.current.findByUrlIgnoringProtocol(licenseUrl).foreach {
+                archiveLicense =>
+                  license.setId(archiveLicense.licenseId)
+              }
+              if (setup.schemaVersion != CycloneDxSchema.Version.VERSION_10) {
+                license.setUrl(licenseUrl)
+              }
+          }
+          if (license.getId == null) {
+            license.setName(modelLicense.name)
           }
           choice.addLicense(license)
       }
