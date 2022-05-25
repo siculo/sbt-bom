@@ -1,8 +1,6 @@
 package io.github.siculo.sbtbom
 
-import _root_.io.github.siculo.sbtbom.ReportModelExtraction._
-import io.circe.generic.auto._
-import io.circe.syntax._
+import io.github.siculo.sbtbom.ReportModelExtraction._
 import io.github.siculo.sbtbom.PluginConstants._
 import io.github.siculo.sbtbom.ReportModel._
 import io.github.siculo.sbtbom.creator._
@@ -11,7 +9,7 @@ import org.cyclonedx.model.Bom
 import org.cyclonedx.parsers.XmlParser
 import org.cyclonedx.{BomGeneratorFactory, CycloneDxSchema}
 import sbt._
-
+import play.api.libs.json._
 import java.nio.charset.Charset
 import scala.collection.JavaConverters._
 
@@ -33,7 +31,7 @@ abstract class BomTask[T](protected val taskSetup: TaskSetup) {
     taskSetup.reportFile.foreach {
       file =>
         log.info(s"Creating report file ${file.getPath}")
-        writeToFile(file, dependencyReport.asJson.toString())
+        writeToFile(file, Json.prettyPrint(Json.toJson(dependencyReport)))
     }
     getXmlText(bom)
   }

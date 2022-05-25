@@ -43,9 +43,10 @@ The `listBom` command can be used to generate the contents of the BOM without wr
 
 ### configuration
 
-| Setting     | Type        | Description   |
-| ----------- | ----------- | ------------- |
-| bomFileName | String      | bom file name |
+| Setting        | Type           | Description      |
+|----------------|----------------|------------------|
+| bomFileName    | String         | bom file name    |
+| reportFileName | Option[String] | report file name |
 
 Sample configuration:
 
@@ -53,6 +54,7 @@ Sample configuration:
 lazy val root = (project in file("."))
   .settings(
     bomFileName := "bom.xml",
+    reportFileName := Some("report.json"),
     Test / bomFileName := "test.bom.xml",
     IntegrationTest / bomFileName := "integrationTest.bom.xml",
   )

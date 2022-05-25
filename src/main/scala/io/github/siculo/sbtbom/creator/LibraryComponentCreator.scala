@@ -18,10 +18,6 @@ class LibraryComponentCreator(setup: BomCreatorSetup, dependency: Dependency) {
         <publisher>The person(s) or organization(s) that published the component</publisher> [evaluate]
     todo may be ok
         <scope>required</scope>
-    todo
-        <hashes>
-          <hash>bom:hashType</hash>
-        </hashes>
     todo evaluate license id
         <licenses>
           <license>
@@ -57,6 +53,7 @@ class LibraryComponentCreator(setup: BomCreatorSetup, dependency: Dependency) {
       dependency.licenses.foreach {
         modelLicense =>
           val license = new License()
+          modelLicense.url.toSeq
           license.setName(modelLicense.name)
           if (setup.schemaVersion != CycloneDxSchema.Version.VERSION_10) {
             modelLicense.url.foreach(license.setUrl)
