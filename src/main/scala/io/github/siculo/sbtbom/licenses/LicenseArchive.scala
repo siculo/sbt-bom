@@ -2,7 +2,7 @@ package io.github.siculo.sbtbom.licenses
 
 import io.github.siculo.sbtbom.licenses.Model._
 
-import java.net.{URI, URL}
+import java.net.URI
 import scala.io.Source
 import scala.util.Try
 
@@ -42,10 +42,19 @@ class LicenseArchive(archive: Option[Licenses]) {
     }.filter(_.isSuccess).map(_.get)
 
   private def allProtocolURI(uri: URI): Seq[URI] =
-    Seq(
-      new URI("http", uri.getUserInfo, uri.getHost, uri.getPort, uri.getPath, uri.getQuery, uri.getFragment),
-      new URI("https", uri.getUserInfo, uri.getHost, uri.getPort, uri.getPath, uri.getQuery, uri.getFragment)
-    )
+    if (uri.isAbsolute) {
+      uri.getScheme.toLowerCase match {
+        case "http" | "https" =>
+          Seq(
+            new URI("http", uri.getUserInfo, uri.getHost, uri.getPort, uri.getPath, uri.getQuery, uri.getFragment),
+            new URI("https", uri.getUserInfo, uri.getHost, uri.getPort, uri.getPath, uri.getQuery, uri.getFragment)
+          )
+        case _ =>
+          Seq(uri)
+      }
+    } else {
+      Seq(uri)
+    }
 
   def findByCriteria(criteria: License => Boolean): Option[License] =
     allLicenses.find(criteria)

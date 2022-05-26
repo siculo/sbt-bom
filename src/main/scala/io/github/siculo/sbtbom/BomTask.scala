@@ -26,7 +26,7 @@ abstract class BomTask[T](protected val taskSetup: TaskSetup) {
   protected def getBomText: String = {
     val creatorSetup: BomCreatorSetup = BomCreatorSetup(schemaVersion, currentConfiguration, log)
     val dependencyReport: DependencyReport = report.asDependencyReportForConfiguration(currentConfiguration)
-    val bom: Bom = new BomCreator(creatorSetup, dependencyReport).create
+    val bom: Bom = new BomCreator(creatorSetup).create(dependencyReport)
     logBomInfo(creatorSetup, bom)
     taskSetup.reportFile.foreach {
       file =>

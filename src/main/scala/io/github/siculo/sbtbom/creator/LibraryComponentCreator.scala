@@ -1,31 +1,23 @@
 package io.github.siculo.sbtbom.creator
 
 import com.github.packageurl.PackageURL
+import io.github.siculo.sbtbom.ReportModel
 import io.github.siculo.sbtbom.ReportModel._
-import io.github.siculo.sbtbom.licenses.{LicenseArchive, Model}
-import org.cyclonedx.CycloneDxSchema
-import org.cyclonedx.model.{Component, Hash, License, LicenseChoice}
+import org.cyclonedx.model.{Component, Hash, LicenseChoice}
 import org.cyclonedx.util.BomUtils
 
 import java.io.File
 import java.util
 import scala.collection.JavaConverters._
 
-class LibraryComponentCreator(setup: BomCreatorSetup, dependency: Dependency) {
-  val componentType = Component.Type.LIBRARY
+class LibraryComponentCreator(setup: BomCreatorSetup) {
+  private val licenseCreator = new LicenseCreator(setup)
 
   /*
     todo evaluate
         <publisher>The person(s) or organization(s) that published the component</publisher> [evaluate]
     todo may be ok
         <scope>required</scope>
-    todo evaluate license id
-        <licenses>
-          <license>
-            <id>?</id>
-            <name>Apache-2.0</name>
-          </license>
-        </licenses>
     todo evaluate
         <copyright>optional copyright</copyright> [evaluate]
         <cpe>@https://nvd.nist.gov/products/cpe</cpe> [evaluate]
@@ -37,7 +29,7 @@ class LibraryComponentCreator(setup: BomCreatorSetup, dependency: Dependency) {
         </components>
   */
 
-  def create: Component = {
+  def create(dependency: Dependency): Component = {
     val component = new Component()
     component.setGroup(dependency.group)
     component.setName(dependency.name)
@@ -48,37 +40,28 @@ class LibraryComponentCreator(setup: BomCreatorSetup, dependency: Dependency) {
       new PackageURL(PackageURL.StandardTypes.MAVEN, dependency.group, dependency.name, dependency.version, new util.TreeMap(), null).canonicalize()
     )
     component.setScope(Component.Scope.REQUIRED)
-    component.setHashes(hashes().asJava)
+    component.setHashes(hashes(dependency.filePaths).asJava)
     if (dependency.licenses.nonEmpty) {
-      val choice = new LicenseChoice()
-      dependency.licenses.foreach {
-        modelLicense =>
-          val license = new License()
-          modelLicense.url.foreach {
-            licenseUrl =>
-              LicenseArchive.current.findByUrlIgnoringProtocol(licenseUrl).foreach {
-                archiveLicense =>
-                  license.setId(archiveLicense.licenseId)
-              }
-              if (setup.schemaVersion != CycloneDxSchema.Version.VERSION_10) {
-                license.setUrl(licenseUrl)
-              }
-          }
-          if (license.getId == null) {
-            license.setName(modelLicense.name)
-          }
-          choice.addLicense(license)
-      }
-      component.setLicenseChoice(choice)
+      component.setLicenseChoice(createLicenseChoice(dependency.licenses))
     }
     component
   }
 
-  private def hashes(): Seq[Hash] =
-    dependency.filePaths.flatMap {
+  private def createLicenseChoice(licenses: Seq[ReportModel.License]): LicenseChoice = {
+    val licenseChoice = new LicenseChoice()
+    licenses.foreach {
+      modelLicense =>
+        licenseChoice.addLicense(licenseCreator.create(modelLicense))
+    }
+    licenseChoice
+  }
+
+  private def hashes(filePaths: Seq[String]): Seq[Hash] = {
+    filePaths.flatMap {
       filePath =>
         BomUtils.calculateHashes(new File(filePath), setup.schemaVersion).asScala
     }
+  }
 
   private def logComponent(component: Component): Unit = {
     setup.log.info(
