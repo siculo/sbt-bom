@@ -19,7 +19,7 @@ object ReportModelExtraction {
   }
 
   implicit class ConfigurationOps(configuration: Configuration) {
-    def dependencyConfigurations: Seq[Configuration] = {
+    def dependencyConfigurations: Seq[Configuration] =
       configuration match {
         case Test =>
           Seq(Test, Runtime, Compile)
@@ -36,7 +36,6 @@ object ReportModelExtraction {
         case _ =>
           Seq()
       }
-    }
   }
 
   implicit class ConfigurationReportOps(configuratioReport: ConfigurationReport) {
@@ -50,7 +49,7 @@ object ReportModelExtraction {
       - "info.versionScheme"
    */
   implicit class ModuleReportOps(moduleReport: ModuleReport) {
-    def asDependency: Dependency = {
+    def asDependency: Dependency =
       Dependency(
         group = moduleReport.module.organization,
         name = moduleReport.module.name,
@@ -62,10 +61,9 @@ object ReportModelExtraction {
         },
         filePaths = artifactPaths(moduleReport)
       )
-    }
   }
 
-  private def artifactPaths(moduleReport: ModuleReport): immutable.Seq[String] = {
+  private def artifactPaths(moduleReport: ModuleReport): immutable.Seq[String] =
     moduleReport.artifacts.map {
       case (_, file) =>
         file
@@ -73,5 +71,4 @@ object ReportModelExtraction {
       file =>
         file.exists() && file.isFile
     }.map(_.getAbsolutePath)
-  }
 }

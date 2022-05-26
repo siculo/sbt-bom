@@ -1,1 +1,4 @@
-> check
+> clean
+> compile
+> makeBom
+$ must-mirror etc/report.json target/report.json
